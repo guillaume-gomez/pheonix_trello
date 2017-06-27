@@ -12,7 +12,7 @@ config :phoenix_trello,
 # Configures the endpoint
 config :phoenix_trello, PhoenixTrello.Endpoint,
   url: [host: "localhost"],
-  secret_key_base: "3pzUfUcsumnUJrmzxzP1QE1xyKPv9HU5ghoy7QGAZXg2Desde+oflE8hZo0DSH6u",
+  secret_key_base: "WEQKoBncNqsqjJyQbUHuWcf3Uxl74JDF/4YDLz+qzThaC/fVOL9o0T5OQ6fmQwdn",
   render_errors: [view: PhoenixTrello.ErrorView, accepts: ~w(html json)],
   pubsub: [name: PhoenixTrello.PubSub,
            adapter: Phoenix.PubSub.PG2]
