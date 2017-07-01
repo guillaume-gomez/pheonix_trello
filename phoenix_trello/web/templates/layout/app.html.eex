@@ -12,7 +12,6 @@
   </head>
 
   <body>
-    <div id="root"></div>
     <div class="container">
       <header class="header">
         <nav role="navigation">
@@ -25,7 +24,9 @@
 
       <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
       <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
-
+      <div class="row">
+        <div id="root"></div>
+      </div>
       <main role="main">
         <%= render @view_module, @view_template, assigns %>
       </main>
