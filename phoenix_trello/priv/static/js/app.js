@@ -32228,7 +32228,6 @@ var store = (0, _store2.default)(_reactRouter.browserHistory);
 
 // import socket from "./socket"
 
-console.log(_reactRouter.browserHistory);
 
 var target = document.getElementById('root');
 var node = _react2.default.createElement(_root2.default, { routerHistory: _reactRouter.browserHistory, store: store });
@@ -32393,7 +32392,6 @@ var Root = function (_Component) {
   _createClass(Root, [{
     key: '_renderRouter',
     value: function _renderRouter() {
-      console.log(this.props);
       (0, _invariant2.default)(this.props.routerHistory, '<Root /> needs either a routingContext or routerHistory to render.');
 
       return _react2.default.createElement(

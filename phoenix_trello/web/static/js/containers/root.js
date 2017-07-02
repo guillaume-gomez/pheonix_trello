@@ -6,7 +6,6 @@ import routes from '../routes';
 
 export default class Root extends Component {
   _renderRouter() {
-    console.log(this.props)
     invariant(
       this.props.routerHistory,
       '<Root /> needs either a routingContext or routerHistory to render.'

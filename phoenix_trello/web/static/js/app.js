@@ -26,7 +26,6 @@ import configureStore from './store';
 import Root from './containers/root';
 
 const store  = configureStore(browserHistory);
-console.log(browserHistory)
 
 const target = document.getElementById('root');
 const node = <Root routerHistory={browserHistory} store={store}/>;
