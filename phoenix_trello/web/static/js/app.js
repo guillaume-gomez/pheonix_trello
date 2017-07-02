@@ -19,18 +19,17 @@ import "phoenix_html"
 // paths "./socket" or full ones "web/static/js/socket".
 
 // import socket from "./socket"
-import React from 'react'
-import { render } from 'react-dom'
-import { Provider } from 'react-redux'
-import { createStore } from 'redux'
-import rootReducer from './reducers'
-import App from './components/App.react'
-let store = createStore(rootReducer)
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { browserHistory } from 'react-router';
+import configureStore from './store';
+import Root from './containers/root';
 
-render(
-    <Provider store={store}>
-        <App />
-    </Provider>,
-    document.getElementById('root')
-)
+const store  = configureStore(browserHistory);
+console.log(browserHistory)
+
+const target = document.getElementById('root');
+const node = <Root routerHistory={browserHistory} store={store}/>;
+
+ReactDOM.render(node, target);
 
