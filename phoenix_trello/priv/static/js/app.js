@@ -26112,6 +26112,7 @@ var store = (0, _redux.createStore)(_reducers2.default); // Brunch automatically
 // If you no longer want to use a dependency, remember
 // to also remove its path from "config.paths.watched".
 
+
 (0, _reactDom.render)(_react2.default.createElement(
     _reactRedux.Provider,
     { store: store },
@@ -26123,10 +26124,12 @@ var store = (0, _redux.createStore)(_reducers2.default); // Brunch automatically
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+  value: true
 });
 
-var _reactRedux = require('react-redux');
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
 
 var _Counter = require('./Counter.react');
 
@@ -26134,22 +26137,14 @@ var _Counter2 = _interopRequireDefault(_Counter);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var mapStateToProps = function mapStateToProps(state) {
-    return {
-        value: state
-    };
+var App = function App() {
+  return _react2.default.createElement(
+    'div',
+    null,
+    _react2.default.createElement(_Counter2.default, null)
+  );
 };
-var mapDispatchToProps = function mapDispatchToProps(dispatch) {
-    return {
-        onIncrement: function onIncrement() {
-            dispatch({ type: 'INCREMENT' });
-        },
-        onDecrement: function onDecrement() {
-            dispatch({ type: 'DECREMENT' });
-        }
-    };
-};
-var App = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_Counter2.default);
+
 exports.default = App;
 });
 
@@ -26157,43 +26152,87 @@ exports.default = App;
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+  value: true
 });
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
+var _reactRedux = require('react-redux');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var Counter = function Counter(_ref) {
-    var value = _ref.value,
-        onIncrement = _ref.onIncrement,
-        onDecrement = _ref.onDecrement;
-    return _react2.default.createElement(
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Counter = function (_Component) {
+  _inherits(Counter, _Component);
+
+  function Counter(props) {
+    _classCallCheck(this, Counter);
+
+    return _possibleConstructorReturn(this, (Counter.__proto__ || Object.getPrototypeOf(Counter)).call(this, props));
+  }
+
+  _createClass(Counter, [{
+    key: 'render',
+    value: function render() {
+      var _props = this.props,
+          value = _props.value,
+          onIncrement = _props.onIncrement,
+          onDecrement = _props.onDecrement;
+
+      return _react2.default.createElement(
         'div',
         null,
         _react2.default.createElement(
-            'h1',
-            null,
-            value
+          'h1',
+          null,
+          value
         ),
         _react2.default.createElement(
-            'button',
-            { onClick: onIncrement },
-            '+'
+          'button',
+          { onClick: onIncrement },
+          '+'
         ),
         _react2.default.createElement(
-            'button',
-            { onClick: onDecrement },
-            '-'
+          'button',
+          { onClick: onDecrement },
+          '-'
         )
-    );
+      );
+    }
+  }]);
+
+  return Counter;
+}(_react.Component);
+
+var mapStateToProps = function mapStateToProps(state) {
+  return {
+    value: state.counter
+  };
 };
-exports.default = Counter;
+var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+  return {
+    onIncrement: function onIncrement() {
+      dispatch({ type: 'INCREMENT' });
+    },
+    onDecrement: function onDecrement() {
+      dispatch({ type: 'DECREMENT' });
+    }
+  };
+};
+
+exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Counter);
 });
 
-;require.register("web/static/js/reducers/index.js", function(exports, require, module) {
+;require.register("web/static/js/reducers/counter.js", function(exports, require, module) {
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -26212,6 +26251,52 @@ exports.default = function () {
     default:
       return state;
   }
+};
+});
+
+;require.register("web/static/js/reducers/index.js", function(exports, require, module) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _redux = require('redux');
+
+var _session = require('./session');
+
+var _session2 = _interopRequireDefault(_session);
+
+var _counter = require('./counter');
+
+var _counter2 = _interopRequireDefault(_counter);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = (0, _redux.combineReducers)({
+  session: _session2.default,
+  counter: _counter2.default
+});
+//export default counter;
+});
+
+require.register("web/static/js/reducers/session.js", function(exports, require, module) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var initialState = {
+  currentUser: null,
+  socket: null,
+  error: null
+};
+
+exports.default = function () {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+  var action = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  return state;
 };
 });
 
@@ -26288,14 +26373,14 @@ channel.join().receive("ok", function (resp) {
 exports.default = socket;
 });
 
-;require.alias("phoenix/priv/static/phoenix.js", "phoenix");
-require.alias("react-redux/lib/index.js", "react-redux");
+;require.alias("phoenix_html/priv/static/phoenix_html.js", "phoenix_html");
 require.alias("react/react.js", "react");
-require.alias("invariant/browser.js", "invariant");
+require.alias("react-redux/lib/index.js", "react-redux");
 require.alias("redux/lib/index.js", "redux");
+require.alias("phoenix/priv/static/phoenix.js", "phoenix");
 require.alias("lodash/lodash.js", "lodash");
-require.alias("process/browser.js", "process");
-require.alias("phoenix_html/priv/static/phoenix_html.js", "phoenix_html");process = require('process');require.register("___globals___", function(exports, require, module) {
+require.alias("invariant/browser.js", "invariant");
+require.alias("process/browser.js", "process");process = require('process');require.register("___globals___", function(exports, require, module) {
   
 });})();require('___globals___');
 
