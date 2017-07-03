@@ -32417,6 +32417,55 @@ var Root = function (_Component) {
 exports.default = Root;
 });
 
+;require.register("web/static/js/layouts/MainLayout.react.js", function(exports, require, module) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactRouter = require('react-router');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var MainLayout = function (_React$Component) {
+  _inherits(MainLayout, _React$Component);
+
+  function MainLayout() {
+    _classCallCheck(this, MainLayout);
+
+    return _possibleConstructorReturn(this, (MainLayout.__proto__ || Object.getPrototypeOf(MainLayout)).call(this));
+  }
+
+  _createClass(MainLayout, [{
+    key: 'render',
+    value: function render() {
+      return _react2.default.createElement(
+        'div',
+        null,
+        this.props.children
+      );
+    }
+  }]);
+
+  return MainLayout;
+}(_react2.default.Component);
+
+exports.default = MainLayout;
+});
+
 ;require.register("web/static/js/reducers/counter.js", function(exports, require, module) {
 'use strict';
 
@@ -32501,13 +32550,21 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
+var _MainLayout = require('../layouts/MainLayout.react');
+
+var _MainLayout2 = _interopRequireDefault(_MainLayout);
+
 var _Counter = require('../components/Counter.react');
 
 var _Counter2 = _interopRequireDefault(_Counter);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-exports.default = _react2.default.createElement(_reactRouter.Route, { path: '/', component: _Counter2.default });
+exports.default = _react2.default.createElement(
+  _reactRouter.Route,
+  { component: _MainLayout2.default },
+  _react2.default.createElement(_reactRouter.Route, { path: '/', component: _Counter2.default })
+);
 });
 
 require.register("web/static/js/socket.js", function(exports, require, module) {
@@ -32620,17 +32677,17 @@ function configureStore(browserHistory) {
 }
 });
 
-;require.alias("phoenix/priv/static/phoenix.js", "phoenix");
-require.alias("phoenix_html/priv/static/phoenix_html.js", "phoenix_html");
+;require.alias("react-router/lib/index.js", "react-router");
 require.alias("react/react.js", "react");
-require.alias("react-router/lib/index.js", "react-router");
+require.alias("phoenix_html/priv/static/phoenix_html.js", "phoenix_html");
+require.alias("phoenix/priv/static/phoenix.js", "phoenix");
 require.alias("react-redux/lib/index.js", "react-redux");
-require.alias("react-router-redux/lib/index.js", "react-router-redux");
-require.alias("redux/lib/index.js", "redux");
-require.alias("redux-thunk/lib/index.js", "redux-thunk");
-require.alias("redux-logger/dist/redux-logger.js", "redux-logger");
 require.alias("invariant/browser.js", "invariant");
 require.alias("redux-simple-router/lib/index.js", "redux-simple-router");
+require.alias("redux/lib/index.js", "redux");
+require.alias("redux-thunk/lib/index.js", "redux-thunk");
+require.alias("react-router-redux/lib/index.js", "react-router-redux");
+require.alias("redux-logger/dist/redux-logger.js", "redux-logger");
 require.alias("warning/browser.js", "warning");
 require.alias("history/lib/index.js", "history");
 require.alias("lodash/lodash.js", "lodash");
