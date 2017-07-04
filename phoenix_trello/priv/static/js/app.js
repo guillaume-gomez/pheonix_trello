@@ -33823,7 +33823,7 @@ require.register("whatwg-fetch/fetch.js", function(exports, require, module) {
 })(typeof self !== 'undefined' ? self : this);
   })();
 });
-require.register("web/static/js/actions/registrations.js", function(exports, require, module) {
+require.register("web/static/js/actions/registrationsActionCreators.js", function(exports, require, module) {
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -33866,7 +33866,7 @@ Actions.signUp = function (data) {
 exports.default = Actions;
 });
 
-require.register("web/static/js/actions/sessions.js", function(exports, require, module) {
+require.register("web/static/js/actions/sessionsActionsCreators.js", function(exports, require, module) {
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -34697,9 +34697,9 @@ var _reactRouter = require('react-router');
 
 var _utils = require('../../utils');
 
-var _registrations = require('../../actions/registrations');
+var _registrationsActionCreators = require('../../actions/registrationsActionCreators');
 
-var _registrations2 = _interopRequireDefault(_registrations);
+var _registrationsActionCreators2 = _interopRequireDefault(_registrationsActionCreators);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -34742,7 +34742,7 @@ var RegistrationsNew = function (_Component) {
         password_confirmation: this.refs.passwordConfirmation.value
       };
 
-      dispatch(_registrations2.default.signUp(data));
+      dispatch(_registrationsActionCreators2.default.signUp(data));
     }
   }, {
     key: 'render',
