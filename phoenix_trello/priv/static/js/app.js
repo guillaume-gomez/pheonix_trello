@@ -34195,6 +34195,74 @@ var Constants = {
 exports.default = Constants;
 });
 
+require.register("web/static/js/containers/authenticated.js", function(exports, require, module) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactRedux = require('react-redux');
+
+var _reduxSimpleRouter = require('redux-simple-router');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } // web/static/js/containers/authenticated.js
+
+
+var AuthenticatedContainer = function (_React$Component) {
+  _inherits(AuthenticatedContainer, _React$Component);
+
+  function AuthenticatedContainer() {
+    _classCallCheck(this, AuthenticatedContainer);
+
+    return _possibleConstructorReturn(this, (AuthenticatedContainer.__proto__ || Object.getPrototypeOf(AuthenticatedContainer)).apply(this, arguments));
+  }
+
+  _createClass(AuthenticatedContainer, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      var _props = this.props,
+          dispatch = _props.dispatch,
+          currentUser = _props.currentUser;
+
+
+      if (localStorage.getItem('phoenixAuthToken')) {
+        dispatch(Actions.currentUser());
+      } else {
+        dispatch(_reduxSimpleRouter.routeActions.push('/sign_up'));
+      }
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      // ...
+    }
+  }]);
+
+  return AuthenticatedContainer;
+}(_react2.default.Component);
+
+var mapStateToProps = function mapStateToProps(state) {
+  return {
+    currentUser: state.session.currentUser
+  };
+};
+
+exports.default = (0, _reactRedux.connect)(mapStateToProps)(AuthenticatedContainer);
+});
+
 require.register("web/static/js/containers/root.js", function(exports, require, module) {
 'use strict';
 
@@ -34968,14 +35036,14 @@ require.alias("phoenix_html/priv/static/phoenix_html.js", "phoenix_html");
 require.alias("react/react.js", "react");
 require.alias("react-router/lib/index.js", "react-router");
 require.alias("react-redux/lib/index.js", "react-redux");
-require.alias("isomorphic-fetch/fetch-npm-browserify.js", "isomorphic-fetch");
-require.alias("es6-promise/dist/es6-promise.js", "es6-promise");
 require.alias("react-router-redux/lib/index.js", "react-router-redux");
 require.alias("invariant/browser.js", "invariant");
 require.alias("redux/lib/index.js", "redux");
-require.alias("redux-simple-router/lib/index.js", "redux-simple-router");
-require.alias("redux-logger/dist/redux-logger.js", "redux-logger");
 require.alias("redux-thunk/lib/index.js", "redux-thunk");
+require.alias("isomorphic-fetch/fetch-npm-browserify.js", "isomorphic-fetch");
+require.alias("redux-logger/dist/redux-logger.js", "redux-logger");
+require.alias("redux-simple-router/lib/index.js", "redux-simple-router");
+require.alias("es6-promise/dist/es6-promise.js", "es6-promise");
 require.alias("process/browser.js", "process");
 require.alias("whatwg-fetch/fetch.js", "whatwg-fetch");
 require.alias("warning/browser.js", "warning");
