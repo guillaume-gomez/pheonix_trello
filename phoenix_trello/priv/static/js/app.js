@@ -33823,7 +33823,7 @@ require.register("whatwg-fetch/fetch.js", function(exports, require, module) {
 })(typeof self !== 'undefined' ? self : this);
   })();
 });
-require.register("web/static/js/actions/registrationsActionCreators.js", function(exports, require, module) {
+require.register("web/static/js/actions/registrationsActionsCreators.js", function(exports, require, module) {
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -33838,7 +33838,7 @@ var _constants2 = _interopRequireDefault(_constants);
 
 var _utils = require('../utils');
 
-var _sessions = require('./sessions');
+var _sessionsActionsCreators = require('./sessionsActionsCreators');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -33849,7 +33849,7 @@ Actions.signUp = function (data) {
     (0, _utils.httpPost)('/api/v1/registrations', { user: data }).then(function (data) {
       localStorage.setItem('phoenixAuthToken', data.jwt);
 
-      (0, _sessions.setCurrentUser)(dispatch, data.user);
+      (0, _sessionsActionsCreators.setCurrentUser)(dispatch, data.user);
 
       dispatch((0, _reactRouterRedux.push)('/'));
     }).catch(function (error) {
@@ -34697,9 +34697,9 @@ var _reactRouter = require('react-router');
 
 var _utils = require('../../utils');
 
-var _registrationsActionCreators = require('../../actions/registrationsActionCreators');
+var _registrationsActionsCreators = require('../../actions/registrationsActionsCreators');
 
-var _registrationsActionCreators2 = _interopRequireDefault(_registrationsActionCreators);
+var _registrationsActionsCreators2 = _interopRequireDefault(_registrationsActionsCreators);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -34742,14 +34742,12 @@ var RegistrationsNew = function (_Component) {
         password_confirmation: this.refs.passwordConfirmation.value
       };
 
-      dispatch(_registrationsActionCreators2.default.signUp(data));
+      dispatch(_registrationsActionsCreators2.default.signUp(data));
     }
   }, {
     key: 'render',
     value: function render() {
       var errors = this.props.errors;
-
-      console.log("jkfjjkjkjkj");
 
       return _react2.default.createElement(
         'div',
@@ -34842,9 +34840,9 @@ var _reactRouter = require('react-router');
 
 var _utils = require('../../utils');
 
-var _sessions = require('../../actions/sessions');
+var _sessionsActionsCreators = require('../../actions/sessionsActionsCreators');
 
-var _sessions2 = _interopRequireDefault(_sessions);
+var _sessionsActionsCreators2 = _interopRequireDefault(_sessionsActionsCreators);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -34883,7 +34881,7 @@ var SessionsNew = function (_React$Component) {
       var dispatch = this.props.dispatch;
 
 
-      dispatch(_sessions2.default.signIn(email.value, password.value));
+      dispatch(_sessionsActionsCreators2.default.signIn(email.value, password.value));
     }
   }, {
     key: '_renderError',
@@ -34970,14 +34968,14 @@ require.alias("phoenix_html/priv/static/phoenix_html.js", "phoenix_html");
 require.alias("react/react.js", "react");
 require.alias("react-router/lib/index.js", "react-router");
 require.alias("react-redux/lib/index.js", "react-redux");
-require.alias("react-router-redux/lib/index.js", "react-router-redux");
-require.alias("redux/lib/index.js", "redux");
-require.alias("invariant/browser.js", "invariant");
-require.alias("redux-simple-router/lib/index.js", "redux-simple-router");
 require.alias("isomorphic-fetch/fetch-npm-browserify.js", "isomorphic-fetch");
 require.alias("es6-promise/dist/es6-promise.js", "es6-promise");
-require.alias("redux-thunk/lib/index.js", "redux-thunk");
+require.alias("react-router-redux/lib/index.js", "react-router-redux");
+require.alias("invariant/browser.js", "invariant");
+require.alias("redux/lib/index.js", "redux");
+require.alias("redux-simple-router/lib/index.js", "redux-simple-router");
 require.alias("redux-logger/dist/redux-logger.js", "redux-logger");
+require.alias("redux-thunk/lib/index.js", "redux-thunk");
 require.alias("process/browser.js", "process");
 require.alias("whatwg-fetch/fetch.js", "whatwg-fetch");
 require.alias("warning/browser.js", "warning");

@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router';
 
 import { setDocumentTitle, renderErrorsFor } from '../../utils';
-import Actions from '../../actions/registrationsActionCreators';
+import Actions from '../../actions/registrationsActionsCreators';
 
 class RegistrationsNew extends Component {
   constructor(props) {
@@ -33,8 +33,6 @@ class RegistrationsNew extends Component {
 
   render() {
     const { errors } = this.props;
-    console.log("jkfjjkjkjkj")
-
     return (
       <div className="view-container registrations new">
         <main>

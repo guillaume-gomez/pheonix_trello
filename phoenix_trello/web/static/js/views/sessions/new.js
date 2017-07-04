@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router';
 
 import { setDocumentTitle } from '../../utils';
-import Actions from '../../actions/sessionsActionCreators';
+import Actions from '../../actions/sessionsActionsCreators';
 
 class SessionsNew extends React.Component {
 
