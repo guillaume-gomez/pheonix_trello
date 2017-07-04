@@ -34353,6 +34353,10 @@ var _counter = require('./counter');
 
 var _counter2 = _interopRequireDefault(_counter);
 
+var _registration = require('./registration');
+
+var _registration2 = _interopRequireDefault(_registration);
+
 var _reduxSimpleRouter = require('redux-simple-router');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -34360,29 +34364,73 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 exports.default = (0, _redux.combineReducers)({
   session: _session2.default,
   counter: _counter2.default,
+  registration: _registration2.default,
   routing: _reduxSimpleRouter.routeReducer
 });
 //export default counter;
 });
 
-require.register("web/static/js/reducers/session.js", function(exports, require, module) {
-"use strict";
+require.register("web/static/js/reducers/registration.js", function(exports, require, module) {
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = reducer;
+
+var _constants = require('../constants');
+
+var _constants2 = _interopRequireDefault(_constants);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 var initialState = {
-  currentUser: null,
-  socket: null,
-  error: null
+  errors: null
 };
 
-exports.default = function () {
+function reducer() {
   var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
   var action = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-  return state;
+  switch (action.type) {
+    case _constants2.default.REGISTRATIONS_ERROR:
+      return Object.assign({}, state, { errors: action.errors });
+
+    default:
+      return state;
+  }
+}
+});
+
+;require.register("web/static/js/reducers/session.js", function(exports, require, module) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = reducer;
+
+var _constants = require('../constants');
+
+var _constants2 = _interopRequireDefault(_constants);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var initialState = {
+  currentUser: null
 };
+
+function reducer() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+  var action = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  switch (action.type) {
+    case _constants2.default.CURRENT_USER:
+      return Object.assign({}, state, currentUser);
+    default:
+      return state;
+  }
+}
 });
 
 ;require.register("web/static/js/routes/index.js", function(exports, require, module) {

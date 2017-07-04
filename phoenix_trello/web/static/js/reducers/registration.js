@@ -1,13 +1,14 @@
 import Constants from '../constants';
 
 const initialState = {
-  currentUser: null,
+  errors: null,
 };
 
 export default function reducer(state = initialState, action = {}) {
   switch (action.type) {
-    case Constants.CURRENT_USER:
-      return Object.assign({}, state, currentUser: action.currentUser);
+    case Constants.REGISTRATIONS_ERROR:
+      return Object.assign({}, state, {errors: action.errors});
+
     default:
       return state;
   }
