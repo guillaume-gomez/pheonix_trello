@@ -1,11 +1,11 @@
-import React, {PropTypes}   from 'react';
-import { connect }          from 'react-redux';
-import { Link }             from 'react-router';
+import React, {PropTypes, Component} from 'react';
+import { connect } from 'react-redux';
+import { Link } from 'react-router';
 
 import { setDocumentTitle, renderErrorsFor } from '../../utils';
-import Actions              from '../../actions/registrations';
+import Actions from '../../actions/registrations';
 
-class RegistrationsNew extends React.Component {
+class RegistrationsNew extends Component {
   constructor(props) {
     super(props)
     this._handleSubmit = this._handleSubmit.bind(this);
@@ -33,6 +33,7 @@ class RegistrationsNew extends React.Component {
 
   render() {
     const { errors } = this.props;
+    console.log("jkfjjkjkjkj")
 
     return (
       <div className="view-container registrations new">

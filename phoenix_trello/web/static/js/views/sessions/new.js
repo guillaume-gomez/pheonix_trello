@@ -77,3 +77,4 @@ const mapStateToProps = (state) => (
   state.session
 );
 
+export default connect(mapStateToProps)(SessionsNew);
