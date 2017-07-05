@@ -19,8 +19,8 @@ defmodule PhoenixTrello.User do
     timestamps()
   end
 
-  @required_fields ~w(first_name last_name email password)
-  @optional_fields ~w(encrypted_password)
+  @required_fields ~w(first_name last_name email password)a
+  @optional_fields ~w(encrypted_password)a
 
   @doc """
   Creates a changeset based on the `model` and `params`.
