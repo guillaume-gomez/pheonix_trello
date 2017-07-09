@@ -34992,7 +34992,7 @@ var SessionsNew = function (_React$Component) {
                 id: 'user_email',
                 placeholder: 'Email',
                 required: 'true',
-                defaultValue: 'john@phoenix-trello.com' })
+                defaultValue: 'guillaume.gomez@phoenix-trello.com' })
             ),
             _react2.default.createElement(
               'div',
@@ -35003,7 +35003,7 @@ var SessionsNew = function (_React$Component) {
                 id: 'user_password',
                 placeholder: 'Password',
                 required: 'true',
-                defaultValue: '12345678' })
+                defaultValue: 'guigui' })
             ),
             _react2.default.createElement(
               'button',
@@ -35032,18 +35032,18 @@ exports.default = (0, _reactRedux.connect)(mapStateToProps)(SessionsNew);
 });
 
 require.alias("phoenix/priv/static/phoenix.js", "phoenix");
-require.alias("phoenix_html/priv/static/phoenix_html.js", "phoenix_html");
 require.alias("react/react.js", "react");
+require.alias("phoenix_html/priv/static/phoenix_html.js", "phoenix_html");
 require.alias("react-router/lib/index.js", "react-router");
 require.alias("react-redux/lib/index.js", "react-redux");
-require.alias("react-router-redux/lib/index.js", "react-router-redux");
-require.alias("invariant/browser.js", "invariant");
-require.alias("redux/lib/index.js", "redux");
-require.alias("redux-thunk/lib/index.js", "redux-thunk");
 require.alias("isomorphic-fetch/fetch-npm-browserify.js", "isomorphic-fetch");
-require.alias("redux-logger/dist/redux-logger.js", "redux-logger");
-require.alias("redux-simple-router/lib/index.js", "redux-simple-router");
 require.alias("es6-promise/dist/es6-promise.js", "es6-promise");
+require.alias("invariant/browser.js", "invariant");
+require.alias("redux-simple-router/lib/index.js", "redux-simple-router");
+require.alias("redux/lib/index.js", "redux");
+require.alias("react-router-redux/lib/index.js", "react-router-redux");
+require.alias("redux-thunk/lib/index.js", "redux-thunk");
+require.alias("redux-logger/dist/redux-logger.js", "redux-logger");
 require.alias("process/browser.js", "process");
 require.alias("whatwg-fetch/fetch.js", "whatwg-fetch");
 require.alias("warning/browser.js", "warning");
