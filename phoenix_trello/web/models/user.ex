@@ -3,7 +3,7 @@ defmodule PhoenixTrello.User do
 
   alias PhoenixTrello.{Board, UserBoard}
 
-  #@derive {Poison.Encoder, only: [:id, :first_name, :last_name, :email]}
+  @derive {Poison.Encoder, only: [:id, :first_name, :last_name, :email]}
 
   schema "users" do
     field :first_name, :string
