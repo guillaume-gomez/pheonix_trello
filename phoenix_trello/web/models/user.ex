@@ -3,7 +3,7 @@ defmodule PhoenixTrello.User do
 
   alias PhoenixTrello.{Board, UserBoard}
 
-  @derive {Poison.Encoder, only: [:id, :first_name, :last_name, :email]}
+  #@derive {Poison.Encoder, only: [:id, :first_name, :last_name, :email]}
 
   schema "users" do
     field :first_name, :string
@@ -12,9 +12,9 @@ defmodule PhoenixTrello.User do
     field :encrypted_password, :string
     field :password, :string, virtual: true
 
-    has_many :owned_boards, Board
-    has_many :user_boards, UserBoard
-    has_many :boards, through: [:user_boards, :board]
+    #has_many :owned_boards, Board
+    #has_many :user_boards, UserBoard
+    #has_many :boards, through: [:user_boards, :board]
 
     timestamps()
   end
@@ -29,7 +29,7 @@ defmodule PhoenixTrello.User do
   """
   def changeset(model, params \\ %{}) do
     model
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, @required_fields)
     |> validate_format(:email, ~r/@/)
     |> validate_length(:password, min: 5)
     |> validate_confirmation(:password, message: "Password does not match")
