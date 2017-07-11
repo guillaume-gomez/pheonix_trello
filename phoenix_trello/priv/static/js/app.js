@@ -33944,13 +33944,11 @@ var Actions = {
 
   currentUser: function currentUser() {
     return function (dispatch) {
-      var authToken = localStorage.getItem('phoenixAuthToken');
-
       (0, _utils.httpGet)('/api/v1/current_user').then(function (data) {
         setCurrentUser(dispatch, data);
       }).catch(function (error) {
         console.log(error);
-        dispatch((0, _reactRouterRedux.push)('/sign_in'));
+        dispatch(routeActions.push('/sign_in'));
       });
     };
   },
@@ -33962,7 +33960,7 @@ var Actions = {
 
         dispatch({ type: _constants2.default.USER_SIGNED_OUT });
 
-        dispatch((0, _reactRouterRedux.push)('/sign_in'));
+        dispatch(routeActions.push('/sign_in'));
 
         dispatch({ type: _constants2.default.BOARDS_FULL_RESET });
       }).catch(function (error) {
@@ -34237,17 +34235,36 @@ var AuthenticatedContainer = function (_React$Component) {
           dispatch = _props.dispatch,
           currentUser = _props.currentUser;
 
+      var phoenixAuthToken = localStorage.getItem('phoenixAuthToken');
 
-      if (localStorage.getItem('phoenixAuthToken')) {
+      if (phoenixAuthToken && !currentUser) {
         dispatch(Actions.currentUser());
-      } else {
-        dispatch(_reduxSimpleRouter.routeActions.push('/sign_up'));
+      } else if (!phoenixAuthToken) {
+        dispatch(_reduxSimpleRouter.routeActions.push('/sign_in'));
       }
     }
   }, {
     key: 'render',
     value: function render() {
-      // ...
+      var _props2 = this.props,
+          currentUser = _props2.currentUser,
+          dispatch = _props2.dispatch;
+
+
+      if (!currentUser) return false;
+
+      return _react2.default.createElement(
+        'div',
+        { className: 'application-container' },
+        _react2.default.createElement(Header, {
+          currentUser: currentUser,
+          dispatch: dispatch }),
+        _react2.default.createElement(
+          'div',
+          { className: 'main-container' },
+          this.props.children
+        )
+      );
     }
   }]);
 
@@ -34485,7 +34502,8 @@ var _constants2 = _interopRequireDefault(_constants);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var initialState = {
-  currentUser: null
+  currentUser: null,
+  error: null
 };
 
 function reducer() {
@@ -34495,6 +34513,10 @@ function reducer() {
   switch (action.type) {
     case _constants2.default.CURRENT_USER:
       return Object.assign({}, state, currentUser);
+    case _constants2.default.SESSIONS_ERROR:
+      return Object.assign({}, state, { error: action.error });
+    case _constants2.default.USER_SIGNED_OUT:
+      return initialState;
     default:
       return state;
   }
@@ -35031,19 +35053,19 @@ var mapStateToProps = function mapStateToProps(state) {
 exports.default = (0, _reactRedux.connect)(mapStateToProps)(SessionsNew);
 });
 
+require.alias("phoenix_html/priv/static/phoenix_html.js", "phoenix_html");
 require.alias("phoenix/priv/static/phoenix.js", "phoenix");
 require.alias("react/react.js", "react");
-require.alias("phoenix_html/priv/static/phoenix_html.js", "phoenix_html");
 require.alias("react-router/lib/index.js", "react-router");
 require.alias("react-redux/lib/index.js", "react-redux");
 require.alias("isomorphic-fetch/fetch-npm-browserify.js", "isomorphic-fetch");
 require.alias("es6-promise/dist/es6-promise.js", "es6-promise");
-require.alias("invariant/browser.js", "invariant");
-require.alias("redux-simple-router/lib/index.js", "redux-simple-router");
-require.alias("redux/lib/index.js", "redux");
 require.alias("react-router-redux/lib/index.js", "react-router-redux");
-require.alias("redux-thunk/lib/index.js", "redux-thunk");
+require.alias("redux-simple-router/lib/index.js", "redux-simple-router");
+require.alias("invariant/browser.js", "invariant");
+require.alias("redux/lib/index.js", "redux");
 require.alias("redux-logger/dist/redux-logger.js", "redux-logger");
+require.alias("redux-thunk/lib/index.js", "redux-thunk");
 require.alias("process/browser.js", "process");
 require.alias("whatwg-fetch/fetch.js", "whatwg-fetch");
 require.alias("warning/browser.js", "warning");
