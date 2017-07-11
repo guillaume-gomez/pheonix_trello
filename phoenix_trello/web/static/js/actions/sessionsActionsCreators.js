@@ -4,30 +4,24 @@ import { Socket } from 'phoenix';
 import { httpGet, httpPost, httpDelete } from '../utils';
 
 export function setCurrentUser(dispatch, user) {
+  dispatch({
+    type: Constants.CURRENT_USER,
+    currentUser: user,
+  });
+
   const socket = new Socket('/socket', {
     params: { token: localStorage.getItem('phoenixAuthToken') },
-    logger: (kind, msg, data) => { console.log(`${kind}: ${msg}`, data); },
   });
 
   socket.connect();
 
   const channel = socket.channel(`users:${user.id}`);
 
-  if (channel.state != 'joined') {
-    channel.join().receive('ok', () => {
-      dispatch({
-        type: Constants.CURRENT_USER,
-        currentUser: user,
+  channel.join().receive('ok', () => {
+    dispatch({
+        type: Constants.SOCKET_CONNECTED,
         socket: socket,
         channel: channel,
-      });
-    });
-  }
-
-  channel.on('boards:add', (msg) => {
-    dispatch({
-        type: Constants.BOARDS_ADDED,
-        board: msg.board,
       });
   });
 };
