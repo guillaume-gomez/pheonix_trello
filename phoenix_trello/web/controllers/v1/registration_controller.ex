@@ -11,7 +11,6 @@ defmodule PhoenixTrello.RegistrationController  do
     case Repo.insert(changeset) do
       {:ok, user} ->
         {:ok, jwt, _full_claims} = Guardian.encode_and_sign(user, :token)
-
         conn
         |> put_status(:created)
         |> render(PhoenixTrello.SessionView, "show.json", jwt: jwt, user: user)
@@ -19,7 +18,7 @@ defmodule PhoenixTrello.RegistrationController  do
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(PhoenixTrello.RegistrationView, "error.json", changeset: changeset)
+        |> render("error.json", changeset: changeset)
     end
   end
 end
