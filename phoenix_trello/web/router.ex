@@ -25,6 +25,8 @@ defmodule PhoenixTrello.Router do
 
       post "/sessions", SessionController, :create
       delete "/sessions", SessionController, :delete
+
+      resources "boards", BoardController, only: [:index, :create]
     end
   end
 
