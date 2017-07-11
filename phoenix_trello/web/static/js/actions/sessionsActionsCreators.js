@@ -62,15 +62,13 @@ const Actions = {
 
   currentUser: () => {
     return dispatch => {
-      const authToken = localStorage.getItem('phoenixAuthToken');
-
       httpGet('/api/v1/current_user')
-      .then(function (data) {
+      .then(function(data) {
         setCurrentUser(dispatch, data);
       })
-      .catch(function (error) {
+      .catch(function(error) {
         console.log(error);
-        dispatch(push('/sign_in'));
+        dispatch(routeActions.push('/sign_in'));
       });
     };
   },
@@ -83,7 +81,7 @@ const Actions = {
 
         dispatch({ type: Constants.USER_SIGNED_OUT, });
 
-        dispatch(push('/sign_in'));
+        dispatch(routeActions.push('/sign_in'));
 
         dispatch({ type: Constants.BOARDS_FULL_RESET });
       })
