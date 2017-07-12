@@ -1,7 +1,8 @@
-// web/static/js/containers/authenticated.js
 import React from 'react';
 import { connect } from 'react-redux';
+import Actions from "../actions/sessionsActionsCreators";
 import { routeActions } from 'redux-simple-router';
+import Header from "../layouts/header";
 
 class AuthenticatedContainer extends React.Component {
   componentDidMount() {
