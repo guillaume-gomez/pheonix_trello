@@ -150,6 +150,99 @@ var __makeRelativeRequire = function(require, mappings, pref) {
   }
 };
 
+require.register("charenc/charenc.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "charenc");
+  (function() {
+    var charenc = {
+  // UTF-8 encoding
+  utf8: {
+    // Convert a string to a byte array
+    stringToBytes: function(str) {
+      return charenc.bin.stringToBytes(unescape(encodeURIComponent(str)));
+    },
+
+    // Convert a byte array to a string
+    bytesToString: function(bytes) {
+      return decodeURIComponent(escape(charenc.bin.bytesToString(bytes)));
+    }
+  },
+
+  // Binary encoding
+  bin: {
+    // Convert a string to a byte array
+    stringToBytes: function(str) {
+      for (var bytes = [], i = 0; i < str.length; i++)
+        bytes.push(str.charCodeAt(i) & 0xFF);
+      return bytes;
+    },
+
+    // Convert a byte array to a string
+    bytesToString: function(bytes) {
+      for (var str = [], i = 0; i < bytes.length; i++)
+        str.push(String.fromCharCode(bytes[i]));
+      return str.join('');
+    }
+  }
+};
+
+module.exports = charenc;
+  })();
+});
+
+require.register("classnames/index.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "classnames");
+  (function() {
+    /*!
+  Copyright (c) 2016 Jed Watson.
+  Licensed under the MIT License (MIT), see
+  http://jedwatson.github.io/classnames
+*/
+/* global define */
+
+(function () {
+	'use strict';
+
+	var hasOwn = {}.hasOwnProperty;
+
+	function classNames () {
+		var classes = [];
+
+		for (var i = 0; i < arguments.length; i++) {
+			var arg = arguments[i];
+			if (!arg) continue;
+
+			var argType = typeof arg;
+
+			if (argType === 'string' || argType === 'number') {
+				classes.push(arg);
+			} else if (Array.isArray(arg)) {
+				classes.push(classNames.apply(null, arg));
+			} else if (argType === 'object') {
+				for (var key in arg) {
+					if (hasOwn.call(arg, key) && arg[key]) {
+						classes.push(key);
+					}
+				}
+			}
+		}
+
+		return classes.join(' ');
+	}
+
+	if (typeof module !== 'undefined' && module.exports) {
+		module.exports = classNames;
+	} else if (typeof define === 'function' && typeof define.amd === 'object' && define.amd) {
+		// register as 'classnames', consistent with npm package name
+		define('classnames', [], function () {
+			return classNames;
+		});
+	} else {
+		window.classNames = classNames;
+	}
+}());
+  })();
+});
+
 require.register("create-react-class/factory.js", function(exports, require, module) {
   require = __makeRelativeRequire(require, {"transform":["loose-envify"]}, "create-react-class");
   (function() {
@@ -1025,6 +1118,108 @@ function factory(ReactComponent, isValidElement, ReactNoopUpdateQueue) {
 }
 
 module.exports = factory;
+  })();
+});
+
+require.register("crypt/crypt.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "crypt");
+  (function() {
+    (function() {
+  var base64map
+      = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',
+
+  crypt = {
+    // Bit-wise rotation left
+    rotl: function(n, b) {
+      return (n << b) | (n >>> (32 - b));
+    },
+
+    // Bit-wise rotation right
+    rotr: function(n, b) {
+      return (n << (32 - b)) | (n >>> b);
+    },
+
+    // Swap big-endian to little-endian and vice versa
+    endian: function(n) {
+      // If number given, swap endian
+      if (n.constructor == Number) {
+        return crypt.rotl(n, 8) & 0x00FF00FF | crypt.rotl(n, 24) & 0xFF00FF00;
+      }
+
+      // Else, assume array and swap all items
+      for (var i = 0; i < n.length; i++)
+        n[i] = crypt.endian(n[i]);
+      return n;
+    },
+
+    // Generate an array of any length of random bytes
+    randomBytes: function(n) {
+      for (var bytes = []; n > 0; n--)
+        bytes.push(Math.floor(Math.random() * 256));
+      return bytes;
+    },
+
+    // Convert a byte array to big-endian 32-bit words
+    bytesToWords: function(bytes) {
+      for (var words = [], i = 0, b = 0; i < bytes.length; i++, b += 8)
+        words[b >>> 5] |= bytes[i] << (24 - b % 32);
+      return words;
+    },
+
+    // Convert big-endian 32-bit words to a byte array
+    wordsToBytes: function(words) {
+      for (var bytes = [], b = 0; b < words.length * 32; b += 8)
+        bytes.push((words[b >>> 5] >>> (24 - b % 32)) & 0xFF);
+      return bytes;
+    },
+
+    // Convert a byte array to a hex string
+    bytesToHex: function(bytes) {
+      for (var hex = [], i = 0; i < bytes.length; i++) {
+        hex.push((bytes[i] >>> 4).toString(16));
+        hex.push((bytes[i] & 0xF).toString(16));
+      }
+      return hex.join('');
+    },
+
+    // Convert a hex string to a byte array
+    hexToBytes: function(hex) {
+      for (var bytes = [], c = 0; c < hex.length; c += 2)
+        bytes.push(parseInt(hex.substr(c, 2), 16));
+      return bytes;
+    },
+
+    // Convert a byte array to a base-64 string
+    bytesToBase64: function(bytes) {
+      for (var base64 = [], i = 0; i < bytes.length; i += 3) {
+        var triplet = (bytes[i] << 16) | (bytes[i + 1] << 8) | bytes[i + 2];
+        for (var j = 0; j < 4; j++)
+          if (i * 8 + j * 6 <= bytes.length * 8)
+            base64.push(base64map.charAt((triplet >>> 6 * (3 - j)) & 0x3F));
+          else
+            base64.push('=');
+      }
+      return base64.join('');
+    },
+
+    // Convert a base-64 string to a byte array
+    base64ToBytes: function(base64) {
+      // Remove non-base-64 characters
+      base64 = base64.replace(/[^A-Z0-9+\/]/ig, '');
+
+      for (var bytes = [], i = 0, imod4 = 0; i < base64.length;
+          imod4 = ++i % 4) {
+        if (imod4 == 0) continue;
+        bytes.push(((base64map.indexOf(base64.charAt(i - 1))
+            & (Math.pow(2, -2 * imod4 + 8) - 1)) << (imod4 * 2))
+            | (base64map.indexOf(base64.charAt(i)) >>> (6 - imod4 * 2)));
+      }
+      return bytes;
+    }
+  };
+
+  module.exports = crypt;
+})();
   })();
 });
 
@@ -5449,6 +5644,52 @@ module.exports = invariant;
   })();
 });
 
+require.register("is-buffer/index.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "is-buffer");
+  (function() {
+    /*!
+ * Determine if an object is a Buffer
+ *
+ * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+ * @license  MIT
+ */
+
+// The _isBuffer check is for Safari 5-7 support, because it's missing
+// Object.prototype.constructor. Remove this eventually
+module.exports = function (obj) {
+  return obj != null && (isBuffer(obj) || isSlowBuffer(obj) || !!obj._isBuffer)
+}
+
+function isBuffer (obj) {
+  return !!obj.constructor && typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj)
+}
+
+// For Node v0.10 support. Remove this eventually.
+function isSlowBuffer (obj) {
+  return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
+}
+  })();
+});
+
+require.register("is-retina/index.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "is-retina");
+  (function() {
+    module.exports = function() {
+  var mediaQuery;
+  if (typeof window !== "undefined" && window !== null) {
+    mediaQuery = "(-webkit-min-device-pixel-ratio: 1.25), (min--moz-device-pixel-ratio: 1.25), (-o-min-device-pixel-ratio: 5/4), (min-resolution: 1.25dppx)";
+    if (window.devicePixelRatio > 1.25) {
+      return true;
+    }
+    if (window.matchMedia && window.matchMedia(mediaQuery).matches) {
+      return true;
+    }
+  }
+  return false;
+};
+  })();
+});
+
 require.register("isomorphic-fetch/fetch-npm-browserify.js", function(exports, require, module) {
   require = __makeRelativeRequire(require, {}, "isomorphic-fetch");
   (function() {
@@ -5745,6 +5986,172 @@ function isPlainObject(value) {
 }
 
 module.exports = isPlainObject;
+  })();
+});
+
+require.register("md5/md5.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "md5");
+  (function() {
+    (function(){
+  var crypt = require('crypt'),
+      utf8 = require('charenc').utf8,
+      isBuffer = require('is-buffer'),
+      bin = require('charenc').bin,
+
+  // The core
+  md5 = function (message, options) {
+    // Convert to byte array
+    if (message.constructor == String)
+      if (options && options.encoding === 'binary')
+        message = bin.stringToBytes(message);
+      else
+        message = utf8.stringToBytes(message);
+    else if (isBuffer(message))
+      message = Array.prototype.slice.call(message, 0);
+    else if (!Array.isArray(message))
+      message = message.toString();
+    // else, assume byte array already
+
+    var m = crypt.bytesToWords(message),
+        l = message.length * 8,
+        a =  1732584193,
+        b = -271733879,
+        c = -1732584194,
+        d =  271733878;
+
+    // Swap endian
+    for (var i = 0; i < m.length; i++) {
+      m[i] = ((m[i] <<  8) | (m[i] >>> 24)) & 0x00FF00FF |
+             ((m[i] << 24) | (m[i] >>>  8)) & 0xFF00FF00;
+    }
+
+    // Padding
+    m[l >>> 5] |= 0x80 << (l % 32);
+    m[(((l + 64) >>> 9) << 4) + 14] = l;
+
+    // Method shortcuts
+    var FF = md5._ff,
+        GG = md5._gg,
+        HH = md5._hh,
+        II = md5._ii;
+
+    for (var i = 0; i < m.length; i += 16) {
+
+      var aa = a,
+          bb = b,
+          cc = c,
+          dd = d;
+
+      a = FF(a, b, c, d, m[i+ 0],  7, -680876936);
+      d = FF(d, a, b, c, m[i+ 1], 12, -389564586);
+      c = FF(c, d, a, b, m[i+ 2], 17,  606105819);
+      b = FF(b, c, d, a, m[i+ 3], 22, -1044525330);
+      a = FF(a, b, c, d, m[i+ 4],  7, -176418897);
+      d = FF(d, a, b, c, m[i+ 5], 12,  1200080426);
+      c = FF(c, d, a, b, m[i+ 6], 17, -1473231341);
+      b = FF(b, c, d, a, m[i+ 7], 22, -45705983);
+      a = FF(a, b, c, d, m[i+ 8],  7,  1770035416);
+      d = FF(d, a, b, c, m[i+ 9], 12, -1958414417);
+      c = FF(c, d, a, b, m[i+10], 17, -42063);
+      b = FF(b, c, d, a, m[i+11], 22, -1990404162);
+      a = FF(a, b, c, d, m[i+12],  7,  1804603682);
+      d = FF(d, a, b, c, m[i+13], 12, -40341101);
+      c = FF(c, d, a, b, m[i+14], 17, -1502002290);
+      b = FF(b, c, d, a, m[i+15], 22,  1236535329);
+
+      a = GG(a, b, c, d, m[i+ 1],  5, -165796510);
+      d = GG(d, a, b, c, m[i+ 6],  9, -1069501632);
+      c = GG(c, d, a, b, m[i+11], 14,  643717713);
+      b = GG(b, c, d, a, m[i+ 0], 20, -373897302);
+      a = GG(a, b, c, d, m[i+ 5],  5, -701558691);
+      d = GG(d, a, b, c, m[i+10],  9,  38016083);
+      c = GG(c, d, a, b, m[i+15], 14, -660478335);
+      b = GG(b, c, d, a, m[i+ 4], 20, -405537848);
+      a = GG(a, b, c, d, m[i+ 9],  5,  568446438);
+      d = GG(d, a, b, c, m[i+14],  9, -1019803690);
+      c = GG(c, d, a, b, m[i+ 3], 14, -187363961);
+      b = GG(b, c, d, a, m[i+ 8], 20,  1163531501);
+      a = GG(a, b, c, d, m[i+13],  5, -1444681467);
+      d = GG(d, a, b, c, m[i+ 2],  9, -51403784);
+      c = GG(c, d, a, b, m[i+ 7], 14,  1735328473);
+      b = GG(b, c, d, a, m[i+12], 20, -1926607734);
+
+      a = HH(a, b, c, d, m[i+ 5],  4, -378558);
+      d = HH(d, a, b, c, m[i+ 8], 11, -2022574463);
+      c = HH(c, d, a, b, m[i+11], 16,  1839030562);
+      b = HH(b, c, d, a, m[i+14], 23, -35309556);
+      a = HH(a, b, c, d, m[i+ 1],  4, -1530992060);
+      d = HH(d, a, b, c, m[i+ 4], 11,  1272893353);
+      c = HH(c, d, a, b, m[i+ 7], 16, -155497632);
+      b = HH(b, c, d, a, m[i+10], 23, -1094730640);
+      a = HH(a, b, c, d, m[i+13],  4,  681279174);
+      d = HH(d, a, b, c, m[i+ 0], 11, -358537222);
+      c = HH(c, d, a, b, m[i+ 3], 16, -722521979);
+      b = HH(b, c, d, a, m[i+ 6], 23,  76029189);
+      a = HH(a, b, c, d, m[i+ 9],  4, -640364487);
+      d = HH(d, a, b, c, m[i+12], 11, -421815835);
+      c = HH(c, d, a, b, m[i+15], 16,  530742520);
+      b = HH(b, c, d, a, m[i+ 2], 23, -995338651);
+
+      a = II(a, b, c, d, m[i+ 0],  6, -198630844);
+      d = II(d, a, b, c, m[i+ 7], 10,  1126891415);
+      c = II(c, d, a, b, m[i+14], 15, -1416354905);
+      b = II(b, c, d, a, m[i+ 5], 21, -57434055);
+      a = II(a, b, c, d, m[i+12],  6,  1700485571);
+      d = II(d, a, b, c, m[i+ 3], 10, -1894986606);
+      c = II(c, d, a, b, m[i+10], 15, -1051523);
+      b = II(b, c, d, a, m[i+ 1], 21, -2054922799);
+      a = II(a, b, c, d, m[i+ 8],  6,  1873313359);
+      d = II(d, a, b, c, m[i+15], 10, -30611744);
+      c = II(c, d, a, b, m[i+ 6], 15, -1560198380);
+      b = II(b, c, d, a, m[i+13], 21,  1309151649);
+      a = II(a, b, c, d, m[i+ 4],  6, -145523070);
+      d = II(d, a, b, c, m[i+11], 10, -1120210379);
+      c = II(c, d, a, b, m[i+ 2], 15,  718787259);
+      b = II(b, c, d, a, m[i+ 9], 21, -343485551);
+
+      a = (a + aa) >>> 0;
+      b = (b + bb) >>> 0;
+      c = (c + cc) >>> 0;
+      d = (d + dd) >>> 0;
+    }
+
+    return crypt.endian([a, b, c, d]);
+  };
+
+  // Auxiliary functions
+  md5._ff  = function (a, b, c, d, x, s, t) {
+    var n = a + (b & c | ~b & d) + (x >>> 0) + t;
+    return ((n << s) | (n >>> (32 - s))) + b;
+  };
+  md5._gg  = function (a, b, c, d, x, s, t) {
+    var n = a + (b & d | c & ~d) + (x >>> 0) + t;
+    return ((n << s) | (n >>> (32 - s))) + b;
+  };
+  md5._hh  = function (a, b, c, d, x, s, t) {
+    var n = a + (b ^ c ^ d) + (x >>> 0) + t;
+    return ((n << s) | (n >>> (32 - s))) + b;
+  };
+  md5._ii  = function (a, b, c, d, x, s, t) {
+    var n = a + (c ^ (b | ~d)) + (x >>> 0) + t;
+    return ((n << s) | (n >>> (32 - s))) + b;
+  };
+
+  // Package private blocksize
+  md5._blocksize = 16;
+  md5._digestsize = 16;
+
+  module.exports = function (message, options) {
+    if (message === undefined || message === null)
+      throw new Error('Illegal argument ' + message);
+
+    var digestbytes = crypt.wordsToBytes(md5(message, options));
+    return options && options.asBytes ? digestbytes :
+        options && options.asString ? bin.bytesToString(digestbytes) :
+        crypt.bytesToHex(digestbytes);
+  };
+
+})();
   })();
 });
 
@@ -24726,6 +25133,558 @@ module.exports = validateDOMNesting;
   })();
 });
 
+require.register("react-gravatar/dist/index.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "react-gravatar");
+  (function() {
+    'use strict';
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _md = require('md5');
+
+var _md2 = _interopRequireDefault(_md);
+
+var _queryString = require('query-string');
+
+var _queryString2 = _interopRequireDefault(_queryString);
+
+var _isRetina = require('is-retina');
+
+var _isRetina2 = _interopRequireDefault(_isRetina);
+
+var _propTypes = require('prop-types');
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Gravatar = function (_React$Component) {
+  _inherits(Gravatar, _React$Component);
+
+  function Gravatar() {
+    _classCallCheck(this, Gravatar);
+
+    return _possibleConstructorReturn(this, (Gravatar.__proto__ || Object.getPrototypeOf(Gravatar)).apply(this, arguments));
+  }
+
+  _createClass(Gravatar, [{
+    key: 'render',
+    value: function render() {
+      var base = this.props.protocol + 'www.gravatar.com/avatar/';
+
+      var query = _queryString2.default.stringify({
+        s: this.props.size,
+        r: this.props.rating,
+        d: this.props.default
+      });
+
+      var retinaQuery = _queryString2.default.stringify({
+        s: this.props.size * 2,
+        r: this.props.rating,
+        d: this.props.default
+      });
+
+      // Gravatar service currently trims and lowercases all registered emails
+      var formattedEmail = ('' + this.props.email).trim().toLowerCase();
+
+      var hash = void 0;
+      if (this.props.md5) {
+        hash = this.props.md5;
+      } else if (typeof this.props.email === 'string') {
+        hash = (0, _md2.default)(formattedEmail, { encoding: "binary" });
+      } else {
+        console.warn('Gravatar image can not be fetched. Either the "email" or "md5" prop must be specified.');
+        return _react2.default.createElement('script', null);
+      }
+
+      var src = '' + base + hash + '?' + query;
+      var retinaSrc = '' + base + hash + '?' + retinaQuery;
+
+      var modernBrowser = true; // server-side, we render for modern browsers
+
+      if (typeof window !== 'undefined') {
+        // this is not NodeJS
+        modernBrowser = 'srcset' in document.createElement('img');
+      }
+
+      var className = 'react-gravatar';
+      if (this.props.className) {
+        className = className + ' ' + this.props.className;
+      }
+
+      // Clone this.props and then delete Component specific props so we can
+      // spread the rest into the img.
+
+      var rest = _objectWithoutProperties(this.props, []);
+
+      delete rest.md5;
+      delete rest.email;
+      delete rest.protocol;
+      delete rest.rating;
+      delete rest.size;
+      delete rest.style;
+      delete rest.className;
+      delete rest.default;
+      if (!modernBrowser && (0, _isRetina2.default)()) {
+        return _react2.default.createElement('img', _extends({
+          alt: 'Gravatar for ' + formattedEmail,
+          style: this.props.style,
+          src: retinaSrc,
+          height: this.props.size,
+          width: this.props.size
+        }, rest, {
+          className: className
+        }));
+      }
+      return _react2.default.createElement('img', _extends({
+        alt: 'Gravatar for ' + formattedEmail,
+        style: this.props.style,
+        src: src,
+        srcSet: retinaSrc + ' 2x',
+        height: this.props.size,
+        width: this.props.size
+      }, rest, {
+        className: className
+      }));
+    }
+  }]);
+
+  return Gravatar;
+}(_react2.default.Component);
+
+Gravatar.displayName = 'Gravatar';
+Gravatar.propTypes = {
+  email: _propTypes2.default.string,
+  md5: _propTypes2.default.string,
+  size: _propTypes2.default.number,
+  rating: _propTypes2.default.string,
+  default: _propTypes2.default.string,
+  className: _propTypes2.default.string,
+  protocol: _propTypes2.default.string,
+  style: _propTypes2.default.object
+};
+Gravatar.defaultProps = {
+  size: 50,
+  rating: 'g',
+  default: 'retro',
+  protocol: '//'
+};
+
+
+module.exports = Gravatar;
+  })();
+});
+
+require.register("react-gravatar/node_modules/query-string/index.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "react-gravatar/node_modules/query-string");
+  (function() {
+    'use strict';
+var strictUriEncode = require('strict-uri-encode');
+var objectAssign = require('object-assign');
+
+function encoderForArrayFormat(opts) {
+	switch (opts.arrayFormat) {
+		case 'index':
+			return function (key, value, index) {
+				return value === null ? [
+					encode(key, opts),
+					'[',
+					index,
+					']'
+				].join('') : [
+					encode(key, opts),
+					'[',
+					encode(index, opts),
+					']=',
+					encode(value, opts)
+				].join('');
+			};
+
+		case 'bracket':
+			return function (key, value) {
+				return value === null ? encode(key, opts) : [
+					encode(key, opts),
+					'[]=',
+					encode(value, opts)
+				].join('');
+			};
+
+		default:
+			return function (key, value) {
+				return value === null ? encode(key, opts) : [
+					encode(key, opts),
+					'=',
+					encode(value, opts)
+				].join('');
+			};
+	}
+}
+
+function parserForArrayFormat(opts) {
+	var result;
+
+	switch (opts.arrayFormat) {
+		case 'index':
+			return function (key, value, accumulator) {
+				result = /\[(\d*)\]$/.exec(key);
+
+				key = key.replace(/\[\d*\]$/, '');
+
+				if (!result) {
+					accumulator[key] = value;
+					return;
+				}
+
+				if (accumulator[key] === undefined) {
+					accumulator[key] = {};
+				}
+
+				accumulator[key][result[1]] = value;
+			};
+
+		case 'bracket':
+			return function (key, value, accumulator) {
+				result = /(\[\])$/.exec(key);
+				key = key.replace(/\[\]$/, '');
+
+				if (!result) {
+					accumulator[key] = value;
+					return;
+				} else if (accumulator[key] === undefined) {
+					accumulator[key] = [value];
+					return;
+				}
+
+				accumulator[key] = [].concat(accumulator[key], value);
+			};
+
+		default:
+			return function (key, value, accumulator) {
+				if (accumulator[key] === undefined) {
+					accumulator[key] = value;
+					return;
+				}
+
+				accumulator[key] = [].concat(accumulator[key], value);
+			};
+	}
+}
+
+function encode(value, opts) {
+	if (opts.encode) {
+		return opts.strict ? strictUriEncode(value) : encodeURIComponent(value);
+	}
+
+	return value;
+}
+
+function keysSorter(input) {
+	if (Array.isArray(input)) {
+		return input.sort();
+	} else if (typeof input === 'object') {
+		return keysSorter(Object.keys(input)).sort(function (a, b) {
+			return Number(a) - Number(b);
+		}).map(function (key) {
+			return input[key];
+		});
+	}
+
+	return input;
+}
+
+exports.extract = function (str) {
+	return str.split('?')[1] || '';
+};
+
+exports.parse = function (str, opts) {
+	opts = objectAssign({arrayFormat: 'none'}, opts);
+
+	var formatter = parserForArrayFormat(opts);
+
+	// Create an object with no prototype
+	// https://github.com/sindresorhus/query-string/issues/47
+	var ret = Object.create(null);
+
+	if (typeof str !== 'string') {
+		return ret;
+	}
+
+	str = str.trim().replace(/^(\?|#|&)/, '');
+
+	if (!str) {
+		return ret;
+	}
+
+	str.split('&').forEach(function (param) {
+		var parts = param.replace(/\+/g, ' ').split('=');
+		// Firefox (pre 40) decodes `%3D` to `=`
+		// https://github.com/sindresorhus/query-string/pull/37
+		var key = parts.shift();
+		var val = parts.length > 0 ? parts.join('=') : undefined;
+
+		// missing `=` should be `null`:
+		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
+		val = val === undefined ? null : decodeURIComponent(val);
+
+		formatter(decodeURIComponent(key), val, ret);
+	});
+
+	return Object.keys(ret).sort().reduce(function (result, key) {
+		var val = ret[key];
+		if (Boolean(val) && typeof val === 'object' && !Array.isArray(val)) {
+			// Sort object keys, not values
+			result[key] = keysSorter(val);
+		} else {
+			result[key] = val;
+		}
+
+		return result;
+	}, Object.create(null));
+};
+
+exports.stringify = function (obj, opts) {
+	var defaults = {
+		encode: true,
+		strict: true,
+		arrayFormat: 'none'
+	};
+
+	opts = objectAssign(defaults, opts);
+
+	var formatter = encoderForArrayFormat(opts);
+
+	return obj ? Object.keys(obj).sort().map(function (key) {
+		var val = obj[key];
+
+		if (val === undefined) {
+			return '';
+		}
+
+		if (val === null) {
+			return encode(key, opts);
+		}
+
+		if (Array.isArray(val)) {
+			var result = [];
+
+			val.slice().forEach(function (val2) {
+				if (val2 === undefined) {
+					return;
+				}
+
+				result.push(formatter(key, val2, result.length));
+			});
+
+			return result.join('&');
+		}
+
+		return encode(key, opts) + '=' + encode(val, opts);
+	}).filter(function (x) {
+		return x.length > 0;
+	}).join('&') : '';
+};
+  })();
+});
+
+require.register("react-page-click/lib/Component.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "react-page-click");
+  (function() {
+    'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.ReactPageClick = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var MAX_MOVE = 20;
+
+var extractCoordinates = function extractCoordinates(_ref) {
+  var changedTouches = _ref.changedTouches;
+  return { x: changedTouches[0].screenX, y: changedTouches[0].screenY };
+};
+
+var ReactPageClick = exports.ReactPageClick = function (_React$PureComponent) {
+  _inherits(ReactPageClick, _React$PureComponent);
+
+  function ReactPageClick() {
+    var _ref2;
+
+    var _temp, _this, _ret;
+
+    _classCallCheck(this, ReactPageClick);
+
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref2 = ReactPageClick.__proto__ || Object.getPrototypeOf(ReactPageClick)).call.apply(_ref2, [this].concat(args))), _this), _initialiseProps.call(_this), _temp), _possibleConstructorReturn(_this, _ret);
+  }
+
+  _createClass(ReactPageClick, [{
+    key: 'componentWillMount',
+    value: function componentWillMount() {
+      this.insideClick = false;
+      this.touchStart = null;
+    }
+  }, {
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      global.window.addEventListener('mousedown', this.onDocumentMouseDown, false);
+      global.window.addEventListener('mouseup', this.onDocumentMouseUp, false);
+      global.window.addEventListener('touchstart', this.onDocumentTouchStart, false);
+      global.window.addEventListener('touchend', this.onDocumentTouchEnd, false);
+    }
+  }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      global.window.removeEventListener('mousedown', this.onDocumentMouseDown, false);
+      global.window.removeEventListener('mouseup', this.onDocumentMouseUp, false);
+      global.window.removeEventListener('touchstart', this.onDocumentTouchStart, false);
+      global.window.removeEventListener('touchend', this.onDocumentTouchEnd, false);
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var props = this.props.outsideOnly ? {
+        onMouseDown: this.onMouseDown,
+        onTouchStart: this.onTouchStart
+      } : {};
+
+      return _react2.default.cloneElement(_react2.default.Children.only(this.props.children), props);
+    }
+  }]);
+
+  return ReactPageClick;
+}(_react2.default.PureComponent);
+
+ReactPageClick.defaultProps = {
+  onMouseDown: undefined,
+  onTouchStart: undefined,
+  outsideOnly: true,
+  notifyOnTouchEnd: false
+};
+
+var _initialiseProps = function _initialiseProps() {
+  var _this2 = this;
+
+  this.onDocumentMouseDown = function () {
+    var _props;
+
+    if (_this2.insideClick) {
+      return;
+    }
+    (_props = _this2.props).notify.apply(_props, arguments);
+  };
+
+  this.onDocumentMouseUp = function () {
+    _this2.insideClick = false;
+  };
+
+  this.onDocumentTouchEnd = function (event) {
+    for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+      args[_key2 - 1] = arguments[_key2];
+    }
+
+    // on mobile safari click events are not bubbled up to the document unless the target has the
+    // css `cursor: pointer;` http://www.quirksmode.org/blog/archives/2010/10/click_event_del_1.html
+    // so try and work out if we should call the notify prop
+    if (_this2.props.notifyOnTouchEnd && _this2.touchStart && !_this2.insideClick) {
+      var _extractCoordinates = extractCoordinates(event),
+          x = _extractCoordinates.x,
+          y = _extractCoordinates.y;
+
+      var dx = Math.abs(x - _this2.touchStart.x);
+      var dy = Math.abs(y - _this2.touchStart.y);
+
+      if (dx < MAX_MOVE && dy < MAX_MOVE) {
+        var _props2;
+
+        (_props2 = _this2.props).notify.apply(_props2, [event].concat(args));
+      }
+    }
+    _this2.touchStart = null;
+    _this2.insideClick = false;
+  };
+
+  this.onDocumentTouchStart = function (event) {
+    for (var _len3 = arguments.length, args = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+      args[_key3 - 1] = arguments[_key3];
+    }
+
+    if (_this2.insideClick) {
+      return;
+    }
+    if (_this2.props.notifyOnTouchEnd) {
+      _this2.touchStart = extractCoordinates(event);
+    } else {
+      var _props3;
+
+      (_props3 = _this2.props).notify.apply(_props3, [event].concat(args));
+    }
+  };
+
+  this.onMouseDown = function () {
+    _this2.insideClick = true;
+    if (_this2.props.onMouseDown) {
+      var _props4;
+
+      (_props4 = _this2.props).onMouseDown.apply(_props4, arguments);
+    }
+  };
+
+  this.onTouchStart = function () {
+    _this2.insideClick = true;
+    if (_this2.props.onTouchStart) {
+      var _props5;
+
+      (_props5 = _this2.props).onTouchStart.apply(_props5, arguments);
+    }
+  };
+};
+  })();
+});
+
+require.register("react-page-click/lib/index.js", function(exports, require, module) {
+  require = __makeRelativeRequire(require, {}, "react-page-click");
+  (function() {
+    "use strict";
+
+var _require = require("./Component"),
+    ReactPageClick = _require.ReactPageClick;
+
+ReactPageClick.ReactPageClick = ReactPageClick;
+module.exports = ReactPageClick;
+  })();
+});
+
 require.register("react-redux/lib/components/Provider.js", function(exports, require, module) {
   require = __makeRelativeRequire(require, {"transform":["loose-envify"]}, "react-redux");
   (function() {
@@ -33823,6 +34782,247 @@ require.register("whatwg-fetch/fetch.js", function(exports, require, module) {
 })(typeof self !== 'undefined' ? self : this);
   })();
 });
+require.register("web/static/js/actions/boardsActionsCreators.js", function(exports, require, module) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _constants = require('../constants');
+
+var _constants2 = _interopRequireDefault(_constants);
+
+var _reactRouterRedux = require('react-router-redux');
+
+var _utils = require('../utils');
+
+var _currentBoardActionsCreators = require('./currentBoardActionsCreators');
+
+var _currentBoardActionsCreators2 = _interopRequireDefault(_currentBoardActionsCreators);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Actions = {
+  fetchBoards: function fetchBoards() {
+    return function (dispatch) {
+      dispatch({ type: _constants2.default.BOARDS_FETCHING });
+
+      (0, _utils.httpGet)('/api/v1/boards').then(function (data) {
+        dispatch({
+          type: _constants2.default.BOARDS_RECEIVED,
+          ownedBoards: data.owned_boards
+        });
+      });
+    };
+  },
+
+  showForm: function showForm(show) {
+    return function (dispatch) {
+      dispatch({
+        type: _constants2.default.BOARDS_SHOW_FORM,
+        show: show
+      });
+    };
+  },
+
+  create: function create(data) {
+    return function (dispatch) {
+      (0, _utils.httpPost)('/api/v1/boards', { board: data }).then(function (data) {
+        dispatch({
+          type: _constants2.default.BOARDS_NEW_BOARD_CREATED,
+          board: data
+        });
+
+        dispatch(_reactRouterRedux.routeActions.push('/boards/' + data.id));
+      }).catch(function (error) {
+        error.response.json().then(function (json) {
+          dispatch({
+            type: _constants2.default.BOARDS_CREATE_ERROR,
+            errors: json.errors
+          });
+        });
+      });
+    };
+  }
+};
+
+exports.default = Actions;
+});
+
+require.register("web/static/js/actions/currentBoardActionsCreators.js", function(exports, require, module) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _constants = require('../constants');
+
+var _constants2 = _interopRequireDefault(_constants);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Actions = {
+  showForm: function showForm(show) {
+    return function (dispatch) {
+      dispatch({
+        type: _constants2.default.CURRENT_BOARD_SHOW_FORM,
+        show: show
+      });
+    };
+  },
+
+  connectToChannel: function connectToChannel(socket, boardId) {
+    return function (dispatch) {
+      var channel = socket.channel('boards:' + boardId);
+
+      dispatch({ type: _constants2.default.CURRENT_BOARD_FETCHING });
+
+      channel.join().receive('ok', function (response) {
+        dispatch({
+          type: _constants2.default.BOARDS_SET_CURRENT_BOARD,
+          board: response.board
+        });
+      });
+
+      channel.on('user:joined', function (msg) {
+        dispatch({
+          type: _constants2.default.CURRENT_BOARD_CONNECTED_USERS,
+          users: msg.users
+        });
+      });
+
+      channel.on('user:left', function (msg) {
+        dispatch({
+          type: _constants2.default.CURRENT_BOARD_CONNECTED_USERS,
+          users: msg.users
+        });
+      });
+
+      channel.on('list:created', function (msg) {
+        dispatch({
+          type: _constants2.default.CURRENT_BOARD_LIST_CREATED,
+          list: msg.list
+        });
+      });
+
+      channel.on('card:created', function (msg) {
+        dispatch({
+          type: _constants2.default.CURRENT_BOARD_CARD_CREATED,
+          card: msg.card
+        });
+      });
+
+      channel.on('member:added', function (msg) {
+        dispatch({
+          type: _constants2.default.CURRENT_BOARD_MEMBER_ADDED,
+          user: msg.user
+        });
+      });
+
+      channel.on('card:updated', function (msg) {
+        dispatch({
+          type: _constants2.default.BOARDS_SET_CURRENT_BOARD,
+          board: msg.board
+        });
+
+        dispatch({
+          type: _constants2.default.CURRENT_CARD_SET,
+          card: msg.card
+        });
+      });
+
+      channel.on('list:updated', function (msg) {
+        dispatch({
+          type: _constants2.default.BOARDS_SET_CURRENT_BOARD,
+          board: msg.board
+        });
+      });
+
+      channel.on('comment:created', function (msg) {
+        dispatch({
+          type: _constants2.default.BOARDS_SET_CURRENT_BOARD,
+          board: msg.board
+        });
+
+        dispatch({
+          type: _constants2.default.CURRENT_CARD_SET,
+          card: msg.card
+        });
+      });
+
+      dispatch({
+        type: _constants2.default.CURRENT_BOARD_CONNECTED_TO_CHANNEL,
+        channel: channel
+      });
+    };
+  },
+
+  leaveChannel: function leaveChannel(channel) {
+    return function (dispatch) {
+      channel.leave();
+
+      dispatch({
+        type: _constants2.default.CURRENT_BOARD_RESET
+      });
+    };
+  },
+
+  addNewMember: function addNewMember(channel, email) {
+    return function (dispatch) {
+      channel.push('members:add', { email: email }).receive('error', function (data) {
+        dispatch({
+          type: _constants2.default.CURRENT_BOARD_ADD_MEMBER_ERROR,
+          error: data.error
+        });
+      });
+    };
+  },
+
+  updateCard: function updateCard(channel, card) {
+    return function (dispatch) {
+      channel.push('card:update', { card: card });
+    };
+  },
+
+  updateList: function updateList(channel, list) {
+    return function (dispatch) {
+      channel.push('list:update', { list: list });
+    };
+  },
+
+  showMembersForm: function showMembersForm(show) {
+    return function (dispatch) {
+      dispatch({
+        type: _constants2.default.CURRENT_BOARD_SHOW_MEMBERS_FORM,
+        show: show
+      });
+    };
+  },
+
+  editList: function editList(listId) {
+    return function (dispatch) {
+      dispatch({
+        type: _constants2.default.CURRENT_BOARD_EDIT_LIST,
+        listId: listId
+      });
+    };
+  },
+
+  showCardForm: function showCardForm(listId) {
+    return function (dispatch) {
+      dispatch({
+        type: _constants2.default.CURRENT_BOARD_SHOW_CARD_FORM_FOR_LIST,
+        listId: listId
+      });
+    };
+  }
+};
+
+exports.default = Actions;
+});
+
 require.register("web/static/js/actions/registrationsActionsCreators.js", function(exports, require, module) {
 'use strict';
 
@@ -33887,32 +35087,24 @@ var _utils = require('../utils');
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function setCurrentUser(dispatch, user) {
+  dispatch({
+    type: _constants2.default.CURRENT_USER,
+    currentUser: user
+  });
+
   var socket = new _phoenix.Socket('/socket', {
-    params: { token: localStorage.getItem('phoenixAuthToken') },
-    logger: function logger(kind, msg, data) {
-      console.log(kind + ': ' + msg, data);
-    }
+    params: { token: localStorage.getItem('phoenixAuthToken') }
   });
 
   socket.connect();
 
   var channel = socket.channel('users:' + user.id);
 
-  if (channel.state != 'joined') {
-    channel.join().receive('ok', function () {
-      dispatch({
-        type: _constants2.default.CURRENT_USER,
-        currentUser: user,
-        socket: socket,
-        channel: channel
-      });
-    });
-  }
-
-  channel.on('boards:add', function (msg) {
+  channel.join().receive('ok', function () {
     dispatch({
-      type: _constants2.default.BOARDS_ADDED,
-      board: msg.board
+      type: _constants2.default.SOCKET_CONNECTED,
+      socket: socket,
+      channel: channel
     });
   });
 };
@@ -34053,6 +35245,193 @@ var App = function App() {
 };
 
 exports.default = App;
+});
+
+;require.register("web/static/js/components/BoardCard.react.js", function(exports, require, module) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactRouterRedux = require('react-router-redux');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var BoardCard = function (_React$Component) {
+  _inherits(BoardCard, _React$Component);
+
+  function BoardCard(props) {
+    _classCallCheck(this, BoardCard);
+
+    var _this = _possibleConstructorReturn(this, (BoardCard.__proto__ || Object.getPrototypeOf(BoardCard)).call(this, props));
+
+    _this._handleClick = _this._handleClick.bind(_this);
+    return _this;
+  }
+
+  _createClass(BoardCard, [{
+    key: '_handleClick',
+    value: function _handleClick() {
+      this.props.dispatch((0, _reactRouterRedux.push)('/boards/' + this.props.id));
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      return _react2.default.createElement(
+        'div',
+        { id: this.props.id, className: 'board', onClick: this._handleClick },
+        _react2.default.createElement(
+          'div',
+          { className: 'inner' },
+          _react2.default.createElement(
+            'h4',
+            null,
+            this.props.name
+          )
+        )
+      );
+    }
+  }]);
+
+  return BoardCard;
+}(_react2.default.Component);
+
+exports.default = BoardCard;
+
+
+BoardCard.propTypes = {};
+});
+
+require.register("web/static/js/components/BoardForm.react.js", function(exports, require, module) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactPageClick = require('react-page-click');
+
+var _reactPageClick2 = _interopRequireDefault(_reactPageClick);
+
+var _boardsActionsCreators = require('../actions/boardsActionsCreators');
+
+var _boardsActionsCreators2 = _interopRequireDefault(_boardsActionsCreators);
+
+var _utils = require('../utils');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var BoardForm = function (_React$Component) {
+  _inherits(BoardForm, _React$Component);
+
+  function BoardForm() {
+    _classCallCheck(this, BoardForm);
+
+    return _possibleConstructorReturn(this, (BoardForm.__proto__ || Object.getPrototypeOf(BoardForm)).apply(this, arguments));
+  }
+
+  _createClass(BoardForm, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      this.refs.name.focus();
+      this._handleSubmit = this._handleSubmit.bind(this);
+      this._handleCancelClick = this._handleCancelClick.bind(this);
+      his._handleCancelClick = this._handleCancelClick.bind(this);
+    }
+  }, {
+    key: '_handleSubmit',
+    value: function _handleSubmit(e) {
+      e.preventDefault();
+
+      var dispatch = this.props.dispatch;
+      var name = this.refs.name;
+
+
+      var data = {
+        name: name.value
+      };
+
+      dispatch(_boardsActionsCreators2.default.create(data));
+    }
+  }, {
+    key: '_handleCancelClick',
+    value: function _handleCancelClick(e) {
+      e.preventDefault();
+
+      this.props.onCancelClick();
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var errors = this.props.errors;
+
+
+      return _react2.default.createElement(
+        _reactPageClick2.default,
+        { onClick: this._handleCancelClick },
+        _react2.default.createElement(
+          'div',
+          { className: 'board form' },
+          _react2.default.createElement(
+            'div',
+            { className: 'inner' },
+            _react2.default.createElement(
+              'h4',
+              null,
+              'New board'
+            ),
+            _react2.default.createElement(
+              'form',
+              { id: 'new_board_form', onSubmit: this._handleSubmit },
+              _react2.default.createElement('input', { ref: 'name', id: 'board_name', type: 'text', placeholder: 'Board name', required: 'true' }),
+              (0, _utils.renderErrorsFor)(errors, 'name'),
+              _react2.default.createElement(
+                'button',
+                { type: 'submit' },
+                'Create board'
+              ),
+              ' or ',
+              _react2.default.createElement(
+                'a',
+                { href: '#', onClick: this._handleCancelClick },
+                'cancel'
+              )
+            )
+          )
+        )
+      );
+    }
+  }]);
+
+  return BoardForm;
+}(_react2.default.Component);
+
+exports.default = BoardForm;
 });
 
 ;require.register("web/static/js/components/Counter.react.js", function(exports, require, module) {
@@ -34399,6 +35778,198 @@ var MainLayout = function (_React$Component) {
 exports.default = MainLayout;
 });
 
+;require.register("web/static/js/layouts/header.js", function(exports, require, module) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactRouter = require('react-router');
+
+var _sessionsActionsCreators = require('../actions/sessionsActionsCreators');
+
+var _sessionsActionsCreators2 = _interopRequireDefault(_sessionsActionsCreators);
+
+var _reactGravatar = require('react-gravatar');
+
+var _reactGravatar2 = _interopRequireDefault(_reactGravatar);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Header = function (_React$Component) {
+  _inherits(Header, _React$Component);
+
+  function Header() {
+    _classCallCheck(this, Header);
+
+    var _this = _possibleConstructorReturn(this, (Header.__proto__ || Object.getPrototypeOf(Header)).call(this));
+
+    _this._handleSignOutClick = _this._handleSignOutClick.bind(_this);
+    return _this;
+  }
+
+  _createClass(Header, [{
+    key: '_renderCurrentUser',
+    value: function _renderCurrentUser() {
+      var currentUser = this.props.currentUser;
+
+
+      if (!currentUser) {
+        return false;
+      }
+
+      var fullName = [currentUser.first_name, currentUser.last_name].join(' ');
+
+      return _react2.default.createElement(
+        'a',
+        { className: 'current-user' },
+        _react2.default.createElement(_reactGravatar2.default, { email: currentUser.email, https: true }),
+        ' ',
+        fullName
+      );
+    }
+  }, {
+    key: '_renderSignOutLink',
+    value: function _renderSignOutLink() {
+      if (!this.props.currentUser) {
+        return false;
+      }
+
+      return _react2.default.createElement(
+        'a',
+        { href: '#', onClick: this._handleSignOutClick },
+        _react2.default.createElement('i', { className: 'fa fa-sign-out' }),
+        ' Sign out'
+      );
+    }
+  }, {
+    key: '_handleSignOutClick',
+    value: function _handleSignOutClick(e) {
+      e.preventDefault();
+
+      this.props.dispatch(_sessionsActionsCreators2.default.signOut());
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      return _react2.default.createElement(
+        'header',
+        { className: 'main-header' },
+        _react2.default.createElement(
+          'nav',
+          null,
+          _react2.default.createElement(
+            'ul',
+            null,
+            _react2.default.createElement(
+              'li',
+              null,
+              _react2.default.createElement(
+                _reactRouter.Link,
+                { to: '/' },
+                _react2.default.createElement('i', { className: 'fa fa-columns' }),
+                ' Boards'
+              )
+            )
+          )
+        ),
+        _react2.default.createElement(
+          _reactRouter.Link,
+          { to: '/' },
+          _react2.default.createElement('span', { className: 'logo' })
+        ),
+        _react2.default.createElement(
+          'nav',
+          { className: 'right' },
+          _react2.default.createElement(
+            'ul',
+            null,
+            _react2.default.createElement(
+              'li',
+              null,
+              this._renderCurrentUser()
+            ),
+            _react2.default.createElement(
+              'li',
+              null,
+              this._renderSignOutLink()
+            )
+          )
+        )
+      );
+    }
+  }]);
+
+  return Header;
+}(_react2.default.Component);
+
+exports.default = Header;
+});
+
+;require.register("web/static/js/reducers/boards.js", function(exports, require, module) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = reducer;
+
+var _constants = require('../constants');
+
+var _constants2 = _interopRequireDefault(_constants);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var initialState = {
+  ownedBoards: [],
+  showForm: false,
+  formErrors: null,
+  fetching: true
+};
+
+function reducer() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+  var action = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  switch (action.type) {
+    case _constants2.default.BOARDS_FETCHING:
+      return Object.assign({}, state, { fetching: true });
+
+    case _constants2.default.BOARDS_RECEIVED:
+      return Object.assign({}, state, { ownedBoards: action.ownedBoards, fetching: false });
+
+    case _constants2.default.BOARDS_SHOW_FORM:
+      return Object.assign({}, state, { showForm: action.show });
+
+    case _constants2.default.BOARDS_CREATE_ERROR:
+      return Object.assign({}, state, { formErrors: action.errors });
+
+    case _constants2.default.BOARDS_NEW_BOARD_CREATED:
+      {
+        var ownedBoards = state.ownedBoards;
+
+        return Object.assign({}, state, { ownedBoards: [action.board].concat(ownedBoards) });
+      }
+
+    default:
+      return state;
+  }
+}
+});
+
 ;require.register("web/static/js/reducers/counter.js", function(exports, require, module) {
 'use strict';
 
@@ -34503,6 +36074,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var initialState = {
   currentUser: null,
+  socket: null,
+  channel: null,
   error: null
 };
 
@@ -34517,6 +36090,8 @@ function reducer() {
       return Object.assign({}, state, { error: action.error });
     case _constants2.default.USER_SIGNED_OUT:
       return initialState;
+    case _constants2.default.SOCKET_CONNECTED:
+      return Object.assign({}, state, { socket: action.socket, channel: action.channel });
     default:
       return state;
   }
@@ -34768,7 +36343,192 @@ function renderErrorsFor(errors, ref) {
 }
 });
 
-;require.register("web/static/js/views/registrations/new.js", function(exports, require, module) {
+;require.register("web/static/js/views/home/index.js", function(exports, require, module) {
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactRedux = require('react-redux');
+
+var _classnames = require('classnames');
+
+var _classnames2 = _interopRequireDefault(_classnames);
+
+var _utils = require('../../utils');
+
+var _boardsActionsCreators = require('../../actions/boardsActionsCreators');
+
+var _boardsActionsCreators2 = _interopRequireDefault(_boardsActionsCreators);
+
+var _BoardCard = require('../../components/BoardCard.react');
+
+var _BoardCard2 = _interopRequireDefault(_BoardCard);
+
+var _BoardForm = require('../../components/BoardForm.react');
+
+var _BoardForm2 = _interopRequireDefault(_BoardForm);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var HomeIndexView = function (_React$Component) {
+  _inherits(HomeIndexView, _React$Component);
+
+  function HomeIndexView(props) {
+    _classCallCheck(this, HomeIndexView);
+
+    var _this = _possibleConstructorReturn(this, (HomeIndexView.__proto__ || Object.getPrototypeOf(HomeIndexView)).call(this, props));
+
+    _this._renderBoards = _this._renderBoards.bind(_this);
+    _this._renderAddNewBoard = _this._renderAddNewBoard.bind(_this);
+    _this._handleCancelClick = _this._handleCancelClick.bind(_this);
+    return _this;
+  }
+
+  _createClass(HomeIndexView, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      (0, _utils.setDocumentTitle)('Boards');
+
+      var dispatch = this.props.dispatch;
+
+      dispatch(_boardsActionsCreators2.default.fetchBoards());
+    }
+  }, {
+    key: '_renderOwnedBoards',
+    value: function _renderOwnedBoards() {
+      var fetching = this.props.fetching;
+
+
+      var content = false;
+
+      var iconClasses = (0, _classnames2.default)({
+        fa: true,
+        'fa-user': !fetching,
+        'fa-spinner': fetching,
+        'fa-spin': fetching
+      });
+
+      if (!fetching) {
+        content = _react2.default.createElement(
+          'div',
+          { className: 'boards-wrapper' },
+          this._renderBoards(this.props.ownedBoards),
+          this._renderAddNewBoard()
+        );
+      }
+
+      return _react2.default.createElement(
+        'section',
+        null,
+        _react2.default.createElement(
+          'header',
+          { className: 'view-header' },
+          _react2.default.createElement(
+            'h3',
+            null,
+            _react2.default.createElement('i', { className: iconClasses }),
+            ' My boards'
+          )
+        ),
+        content
+      );
+    }
+  }, {
+    key: '_renderBoards',
+    value: function _renderBoards(boards) {
+      var _this2 = this;
+
+      return boards.map(function (board) {
+        return _react2.default.createElement(_BoardCard2.default, _extends({
+          key: board.id,
+          dispatch: _this2.props.dispatch
+        }, board));
+      });
+    }
+  }, {
+    key: '_renderAddNewBoard',
+    value: function _renderAddNewBoard() {
+      var _props = this.props,
+          showForm = _props.showForm,
+          dispatch = _props.dispatch,
+          formErrors = _props.formErrors;
+
+
+      if (!showForm) return this._renderAddButton();
+
+      return _react2.default.createElement(_BoardForm2.default, {
+        dispatch: dispatch,
+        errors: formErrors,
+        onCancelClick: this._handleCancelClick });
+    }
+  }, {
+    key: '_renderAddButton',
+    value: function _renderAddButton() {
+      return _react2.default.createElement(
+        'div',
+        { className: 'board add-new', onClick: this._handleAddNewClick },
+        _react2.default.createElement(
+          'div',
+          { className: 'inner' },
+          _react2.default.createElement(
+            'a',
+            { id: 'add_new_board' },
+            'Add new board...'
+          )
+        )
+      );
+    }
+  }, {
+    key: '_handleAddNewClick',
+    value: function _handleAddNewClick() {
+      var dispatch = this.props.dispatch;
+
+
+      dispatch(_boardsActionsCreators2.default.showForm(true));
+    }
+  }, {
+    key: '_handleCancelClick',
+    value: function _handleCancelClick() {
+      this.props.dispatch(_boardsActionsCreators2.default.showForm(false));
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      return _react2.default.createElement(
+        'div',
+        { className: 'view-container boards index' },
+        this._renderOwnedBoards()
+      );
+    }
+  }]);
+
+  return HomeIndexView;
+}(_react2.default.Component);
+
+var mapStateToProps = function mapStateToProps(state) {
+  return state.boards;
+};
+
+exports.default = (0, _reactRedux.connect)(mapStateToProps)(HomeIndexView);
+});
+
+require.register("web/static/js/views/registrations/new.js", function(exports, require, module) {
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -35053,25 +36813,30 @@ var mapStateToProps = function mapStateToProps(state) {
 exports.default = (0, _reactRedux.connect)(mapStateToProps)(SessionsNew);
 });
 
-require.alias("phoenix_html/priv/static/phoenix_html.js", "phoenix_html");
-require.alias("phoenix/priv/static/phoenix.js", "phoenix");
 require.alias("react/react.js", "react");
-require.alias("react-router/lib/index.js", "react-router");
-require.alias("react-redux/lib/index.js", "react-redux");
-require.alias("isomorphic-fetch/fetch-npm-browserify.js", "isomorphic-fetch");
-require.alias("es6-promise/dist/es6-promise.js", "es6-promise");
-require.alias("react-router-redux/lib/index.js", "react-router-redux");
-require.alias("redux-simple-router/lib/index.js", "redux-simple-router");
+require.alias("history/node_modules/warning/browser.js", "history/node_modules/warning");
+require.alias("md5/md5.js", "md5");
 require.alias("invariant/browser.js", "invariant");
+require.alias("react-redux/lib/index.js", "react-redux");
+require.alias("es6-promise/dist/es6-promise.js", "es6-promise");
+require.alias("redux-simple-router/lib/index.js", "redux-simple-router");
+require.alias("phoenix/priv/static/phoenix.js", "phoenix");
+require.alias("react-gravatar/dist/index.js", "react-gravatar");
+require.alias("warning/browser.js", "warning");
+require.alias("isomorphic-fetch/fetch-npm-browserify.js", "isomorphic-fetch");
+require.alias("whatwg-fetch/fetch.js", "whatwg-fetch");
+require.alias("history/lib/index.js", "history");
+require.alias("phoenix_html/priv/static/phoenix_html.js", "phoenix_html");
+require.alias("process/browser.js", "process");
 require.alias("redux/lib/index.js", "redux");
 require.alias("redux-logger/dist/redux-logger.js", "redux-logger");
-require.alias("redux-thunk/lib/index.js", "redux-thunk");
-require.alias("process/browser.js", "process");
-require.alias("whatwg-fetch/fetch.js", "whatwg-fetch");
-require.alias("warning/browser.js", "warning");
-require.alias("history/lib/index.js", "history");
+require.alias("react-page-click/lib/index.js", "react-page-click");
 require.alias("lodash/lodash.js", "lodash");
-require.alias("history/node_modules/warning/browser.js", "history/node_modules/warning");process = require('process');require.register("___globals___", function(exports, require, module) {
+require.alias("react-router-redux/lib/index.js", "react-router-redux");
+require.alias("redux-thunk/lib/index.js", "redux-thunk");
+require.alias("crypt/crypt.js", "crypt");
+require.alias("charenc/charenc.js", "charenc");
+require.alias("react-router/lib/index.js", "react-router");process = require('process');require.register("___globals___", function(exports, require, module) {
   
 });})();require('___globals___');
 
