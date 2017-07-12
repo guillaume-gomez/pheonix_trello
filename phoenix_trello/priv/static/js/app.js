@@ -35082,6 +35082,8 @@ var _constants2 = _interopRequireDefault(_constants);
 
 var _phoenix = require('phoenix');
 
+var _reduxSimpleRouter = require('redux-simple-router');
+
 var _utils = require('../utils');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -35140,7 +35142,7 @@ var Actions = {
         setCurrentUser(dispatch, data);
       }).catch(function (error) {
         console.log(error);
-        dispatch(routeActions.push('/sign_in'));
+        dispatch(_reduxSimpleRouter.routeActions.push('/sign_in'));
       });
     };
   },
@@ -35152,7 +35154,7 @@ var Actions = {
 
         dispatch({ type: _constants2.default.USER_SIGNED_OUT });
 
-        dispatch(routeActions.push('/sign_in'));
+        dispatch(_reduxSimpleRouter.routeActions.push('/sign_in'));
 
         dispatch({ type: _constants2.default.BOARDS_FULL_RESET });
       }).catch(function (error) {
@@ -35572,7 +35574,7 @@ var Constants = {
 exports.default = Constants;
 });
 
-require.register("web/static/js/containers/authenticated.js", function(exports, require, module) {
+require.register("web/static/js/containers/authenticatedContainer.react.js", function(exports, require, module) {
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -35587,7 +35589,15 @@ var _react2 = _interopRequireDefault(_react);
 
 var _reactRedux = require('react-redux');
 
+var _sessionsActionsCreators = require('../actions/sessionsActionsCreators');
+
+var _sessionsActionsCreators2 = _interopRequireDefault(_sessionsActionsCreators);
+
 var _reduxSimpleRouter = require('redux-simple-router');
+
+var _header = require('../layouts/header');
+
+var _header2 = _interopRequireDefault(_header);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -35595,8 +35605,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } // web/static/js/containers/authenticated.js
-
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var AuthenticatedContainer = function (_React$Component) {
   _inherits(AuthenticatedContainer, _React$Component);
@@ -35617,7 +35626,7 @@ var AuthenticatedContainer = function (_React$Component) {
       var phoenixAuthToken = localStorage.getItem('phoenixAuthToken');
 
       if (phoenixAuthToken && !currentUser) {
-        dispatch(Actions.currentUser());
+        dispatch(_sessionsActionsCreators2.default.currentUser());
       } else if (!phoenixAuthToken) {
         dispatch(_reduxSimpleRouter.routeActions.push('/sign_in'));
       }
@@ -35635,7 +35644,7 @@ var AuthenticatedContainer = function (_React$Component) {
       return _react2.default.createElement(
         'div',
         { className: 'application-container' },
-        _react2.default.createElement(Header, {
+        _react2.default.createElement(_header2.default, {
           currentUser: currentUser,
           dispatch: dispatch }),
         _react2.default.createElement(
@@ -36085,7 +36094,7 @@ function reducer() {
 
   switch (action.type) {
     case _constants2.default.CURRENT_USER:
-      return Object.assign({}, state, currentUser);
+      return Object.assign({}, state, { currentUser: action.currentUser });
     case _constants2.default.SESSIONS_ERROR:
       return Object.assign({}, state, { error: action.error });
     case _constants2.default.USER_SIGNED_OUT:
@@ -36119,6 +36128,14 @@ var _Counter = require('../components/Counter.react');
 
 var _Counter2 = _interopRequireDefault(_Counter);
 
+var _authenticatedContainer = require('../containers/authenticatedContainer.react');
+
+var _authenticatedContainer2 = _interopRequireDefault(_authenticatedContainer);
+
+var _home = require('../views/home');
+
+var _home2 = _interopRequireDefault(_home);
+
 var _new = require('../views/registrations/new');
 
 var _new2 = _interopRequireDefault(_new);
@@ -36134,7 +36151,11 @@ exports.default = _react2.default.createElement(
   { component: _MainLayout2.default },
   _react2.default.createElement(_reactRouter.Route, { path: '/sign_up', component: _new2.default }),
   _react2.default.createElement(_reactRouter.Route, { path: '/sign_in', component: _new4.default }),
-  _react2.default.createElement(_reactRouter.Route, { path: '/', component: _Counter2.default })
+  _react2.default.createElement(
+    _reactRouter.Route,
+    { path: '/', component: _authenticatedContainer2.default },
+    _react2.default.createElement(_reactRouter.IndexRoute, { component: _home2.default })
+  )
 );
 });
 
@@ -36407,6 +36428,7 @@ var HomeIndexView = function (_React$Component) {
 
       var dispatch = this.props.dispatch;
 
+      debugger;
       dispatch(_boardsActionsCreators2.default.fetchBoards());
     }
   }, {
@@ -36813,30 +36835,30 @@ var mapStateToProps = function mapStateToProps(state) {
 exports.default = (0, _reactRedux.connect)(mapStateToProps)(SessionsNew);
 });
 
-require.alias("react/react.js", "react");
-require.alias("history/node_modules/warning/browser.js", "history/node_modules/warning");
-require.alias("md5/md5.js", "md5");
 require.alias("invariant/browser.js", "invariant");
-require.alias("react-redux/lib/index.js", "react-redux");
-require.alias("es6-promise/dist/es6-promise.js", "es6-promise");
+require.alias("whatwg-fetch/fetch.js", "whatwg-fetch");
 require.alias("redux-simple-router/lib/index.js", "redux-simple-router");
+require.alias("react-router-redux/lib/index.js", "react-router-redux");
+require.alias("isomorphic-fetch/fetch-npm-browserify.js", "isomorphic-fetch");
+require.alias("react-redux/lib/index.js", "react-redux");
+require.alias("react-router/lib/index.js", "react-router");
+require.alias("process/browser.js", "process");
+require.alias("redux-thunk/lib/index.js", "redux-thunk");
+require.alias("charenc/charenc.js", "charenc");
+require.alias("react/react.js", "react");
+require.alias("react-page-click/lib/index.js", "react-page-click");
+require.alias("phoenix_html/priv/static/phoenix_html.js", "phoenix_html");
+require.alias("lodash/lodash.js", "lodash");
 require.alias("phoenix/priv/static/phoenix.js", "phoenix");
 require.alias("react-gravatar/dist/index.js", "react-gravatar");
 require.alias("warning/browser.js", "warning");
-require.alias("isomorphic-fetch/fetch-npm-browserify.js", "isomorphic-fetch");
-require.alias("whatwg-fetch/fetch.js", "whatwg-fetch");
-require.alias("history/lib/index.js", "history");
-require.alias("phoenix_html/priv/static/phoenix_html.js", "phoenix_html");
-require.alias("process/browser.js", "process");
-require.alias("redux/lib/index.js", "redux");
-require.alias("redux-logger/dist/redux-logger.js", "redux-logger");
-require.alias("react-page-click/lib/index.js", "react-page-click");
-require.alias("lodash/lodash.js", "lodash");
-require.alias("react-router-redux/lib/index.js", "react-router-redux");
-require.alias("redux-thunk/lib/index.js", "redux-thunk");
 require.alias("crypt/crypt.js", "crypt");
-require.alias("charenc/charenc.js", "charenc");
-require.alias("react-router/lib/index.js", "react-router");process = require('process');require.register("___globals___", function(exports, require, module) {
+require.alias("history/node_modules/warning/browser.js", "history/node_modules/warning");
+require.alias("history/lib/index.js", "history");
+require.alias("redux/lib/index.js", "redux");
+require.alias("md5/md5.js", "md5");
+require.alias("redux-logger/dist/redux-logger.js", "redux-logger");
+require.alias("es6-promise/dist/es6-promise.js", "es6-promise");process = require('process');require.register("___globals___", function(exports, require, module) {
   
 });})();require('___globals___');
 
