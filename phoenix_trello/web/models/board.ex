@@ -24,4 +24,5 @@ defmodule PhoenixTrello.Board do
     model
     |> cast(params, @required_fields)
   end
+
 end
