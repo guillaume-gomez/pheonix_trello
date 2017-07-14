@@ -35363,7 +35363,7 @@ var BoardForm = function (_React$Component) {
       this.refs.name.focus();
       this._handleSubmit = this._handleSubmit.bind(this);
       this._handleCancelClick = this._handleCancelClick.bind(this);
-      his._handleCancelClick = this._handleCancelClick.bind(this);
+      this._handleCancelClick = this._handleCancelClick.bind(this);
     }
   }, {
     key: '_handleSubmit',
@@ -35532,6 +35532,7 @@ var Constants = {
   USER_SIGNED_OUT: 'USER_SIGNED_OUT',
   SESSIONS_ERROR: 'SESSIONS_ERROR',
   REGISTRATIONS_ERROR: 'REGISTRATIONS_ERROR',
+  SOCKET_CONNECTED: 'SOCKET_CONNECTED',
 
   BOARDS_FETCHING: 'BOARDS_FETCHING',
   BOARDS_SHOW_FORM: 'BOARDS_SHOW_FORM',
@@ -35974,6 +35975,7 @@ function reducer() {
       }
 
     default:
+      console.log(state);
       return state;
   }
 }
@@ -36144,6 +36146,10 @@ var _new3 = require('../views/sessions/new');
 
 var _new4 = _interopRequireDefault(_new3);
 
+var _show = require('../views/boards/show');
+
+var _show2 = _interopRequireDefault(_show);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = _react2.default.createElement(
@@ -36154,7 +36160,8 @@ exports.default = _react2.default.createElement(
   _react2.default.createElement(
     _reactRouter.Route,
     { path: '/', component: _authenticatedContainer2.default },
-    _react2.default.createElement(_reactRouter.IndexRoute, { component: _home2.default })
+    _react2.default.createElement(_reactRouter.IndexRoute, { component: _home2.default }),
+    _react2.default.createElement(_reactRouter.Route, { path: '/boards/:id', component: _show2.default })
   )
 );
 });
@@ -36364,7 +36371,234 @@ function renderErrorsFor(errors, ref) {
 }
 });
 
-;require.register("web/static/js/views/home/index.js", function(exports, require, module) {
+;require.register("web/static/js/views/boards/show.js", function(exports, require, module) {
+// import React, {PropTypes} from 'react';
+// import { connect } from 'react-redux';
+// import {DragDropContext} from 'react-dnd';
+// import HTML5Backend from 'react-dnd-html5-backend';
+
+// import Actions from '../../actions/current_board';
+// import Constants from '../../constants';
+// import { setDocumentTitle } from '../../utils';
+// import ListForm from '../../components/lists/form';
+// import ListCard from '../../components/lists/card';
+// import BoardMembers from '../../components/boards/members';
+
+// @DragDropContext(HTML5Backend)
+
+// class BoardsShowView extends React.Component {
+//   componentDidMount() {
+//     const { socket } = this.props;
+
+//     if (!socket) {
+//       return false;
+//     }
+
+//     this.props.dispatch(Actions.connectToChannel(socket, this.props.params.id));
+//   }
+
+//   componentWillUpdate(nextProps, nextState) {
+//     const { socket } = this.props;
+//     const { currentBoard } = nextProps;
+
+//     if (currentBoard.name !== undefined) setDocumentTitle(currentBoard.name);
+
+//     if (socket) {
+//       return false;
+//     }
+
+//     this.props.dispatch(Actions.connectToChannel(nextProps.socket, this.props.params.id));
+//   }
+
+//   componentWillUnmount() {
+//     this.props.dispatch(Actions.leaveChannel(this.props.currentBoard.channel));
+//   }
+
+//   _renderMembers() {
+//     const { connectedUsers, showUsersForm, channel, error } = this.props.currentBoard;
+//     const { dispatch } = this.props;
+//     const members = this.props.currentBoard.members;
+//     const currentUserIsOwner = this.props.currentBoard.user.id === this.props.currentUser.id;
+
+//     return (
+//       <BoardMembers
+//         dispatch={dispatch}
+//         channel={channel}
+//         currentUserIsOwner={currentUserIsOwner}
+//         members={members}
+//         connectedUsers={connectedUsers}
+//         error={error}
+//         show={showUsersForm} />
+//     );
+//   }
+
+//   _renderLists() {
+//     const { lists, channel, editingListId, id, addingNewCardInListId } = this.props.currentBoard;
+
+//     return lists.map((list) => {
+//       return (
+//         <ListCard
+//           key={list.id}
+//           boardId={id}
+//           dispatch={this.props.dispatch}
+//           channel={channel}
+//           isEditing={editingListId === list.id}
+//           onDropCard={::this._handleDropCard}
+//           onDropCardWhenEmpty={::this._handleDropCardWhenEmpty}
+//           onDrop={::this._handleDropList}
+//           isAddingNewCard={addingNewCardInListId === list.id}
+//           {...list} />
+//       );
+//     });
+//   }
+
+//   _renderAddNewList() {
+//     const { dispatch, formErrors, currentBoard } = this.props;
+
+//     if (!currentBoard.showForm) return this._renderAddButton();
+
+//     return (
+//       <ListForm
+//         dispatch={dispatch}
+//         errors={formErrors}
+//         channel={currentBoard.channel}
+//         onCancelClick={::this._handleCancelClick} />
+//     );
+//   }
+
+//   _renderAddButton() {
+//     return (
+//       <div className="list add-new" onClick={::this._handleAddNewClick}>
+//         <div className="inner">
+//           Add new list...
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   _handleAddNewClick() {
+//     const { dispatch } = this.props;
+
+//     dispatch(Actions.showForm(true));
+//   }
+
+//   _handleCancelClick() {
+//     this.props.dispatch(Actions.showForm(false));
+//   }
+
+//   _handleDropCard({ source, target }) {
+//     const { lists, channel } = this.props.currentBoard;
+//     const { dispatch } = this.props;
+
+//     const sourceListIndex = lists.findIndex((list) => { return list.id === source.list_id; });
+//     const sourceList = lists[sourceListIndex];
+//     const sourceCardIndex = sourceList.cards.findIndex((card) => { return card.id === source.id; });
+//     const sourceCard = sourceList.cards[sourceCardIndex];
+
+//     const targetListIndex = lists.findIndex((list) => { return list.id === target.list_id; });
+//     let targetList = lists[targetListIndex];
+//     const targetCardIndex = targetList.cards.findIndex((card) => { return card.id === target.id; });
+//     const targetCard = targetList.cards[targetCardIndex];
+//     const previousTargetCard = sourceList.cards[sourceCardIndex + 1];
+
+//     if (previousTargetCard === targetCard) { return false; }
+
+//     sourceList.cards.splice(sourceCardIndex, 1);
+
+//     if (sourceList === targetList) {
+//       const insertIndex = sourceCardIndex < targetCardIndex ? targetCardIndex - 1 : targetCardIndex;
+//       // move at once to avoid complications
+//       targetList = sourceList;
+//       sourceList.cards.splice(insertIndex, 0, source);
+//     } else {
+//       // and move it to target
+//       targetList.cards.splice(targetCardIndex, 0, source);
+//     }
+
+//     const newIndex = targetList.cards.findIndex((card) => { return card.id === source.id; });
+
+//     const position = newIndex == 0 ? targetList.cards[newIndex + 1].position / 2 : newIndex == (targetList.cards.length - 1) ? targetList.cards[newIndex - 1].position + 1024 : (targetList.cards[newIndex - 1].position + targetList.cards[newIndex + 1].position) / 2;
+
+//     const data = {
+//       id: sourceCard.id,
+//       list_id: targetList.id,
+//       position: position,
+//     };
+
+//     dispatch(Actions.updateCard(channel, data));
+//   }
+
+//   _handleDropList({ source, target }) {
+//     const { lists, channel } = this.props.currentBoard;
+//     const { dispatch } = this.props;
+
+//     const sourceListIndex = lists.findIndex((list) => { return list.id === source.id; });
+//     const sourceList = lists[sourceListIndex];
+//     lists.splice(sourceListIndex, 1);
+
+//     const targetListIndex = lists.findIndex((list) => { return list.id === target.id; });
+//     const targetList = lists[targetListIndex];
+//     lists.splice(targetListIndex, 0, sourceList);
+
+//     const newIndex = lists.findIndex((list) => { return list.id === source.id; });
+
+//     const position = newIndex == 0 ? lists[newIndex + 1].position / 2 : newIndex == (lists.length - 1) ? lists[newIndex - 1].position + 1024 : (lists[newIndex - 1].position + lists[newIndex + 1].position) / 2;
+
+//     const data = {
+//       id: source.id,
+//       position: position,
+//     };
+
+//     dispatch(Actions.updateList(channel, data));
+//   }
+
+//   _handleDropCardWhenEmpty(card) {
+//     const { channel } = this.props.currentBoard;
+//     const { dispatch } = this.props;
+
+//     dispatch(Actions.updateCard(channel, card));
+//   }
+
+//   render() {
+//     const { fetching, name } = this.props.currentBoard;
+
+//     if (fetching) return (
+//       <div className="view-container boards show">
+//         <i className="fa fa-spinner fa-spin"/>
+//       </div>
+//     );
+
+//     return (
+//       <div className="view-container boards show">
+//         <header className="view-header">
+//           <h3>{name}</h3>
+//           {::this._renderMembers()}
+//         </header>
+//         <div className="canvas-wrapper">
+//           <div className="canvas">
+//             <div className="lists-wrapper">
+//               {::this._renderLists()}
+//               {::this._renderAddNewList()}
+//             </div>
+//           </div>
+//         </div>
+//         {this.props.children}
+//       </div>
+//     );
+//   }
+// }
+
+// const mapStateToProps = (state) => ({
+//   currentBoard: state.currentBoard,
+//   socket: state.session.socket,
+//   currentUser: state.session.currentUser,
+// });
+
+// export default connect(mapStateToProps)(BoardsShowView);
+"use strict";
+});
+
+require.register("web/static/js/views/home/index.js", function(exports, require, module) {
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -36428,14 +36662,15 @@ var HomeIndexView = function (_React$Component) {
 
       var dispatch = this.props.dispatch;
 
-      debugger;
       dispatch(_boardsActionsCreators2.default.fetchBoards());
     }
   }, {
     key: '_renderOwnedBoards',
     value: function _renderOwnedBoards() {
-      var fetching = this.props.fetching;
-
+      var _props = this.props,
+          fetching = _props.fetching,
+          boards = _props.boards;
+      var ownedBoards = boards.ownedBoards;
 
       var content = false;
 
@@ -36450,7 +36685,7 @@ var HomeIndexView = function (_React$Component) {
         content = _react2.default.createElement(
           'div',
           { className: 'boards-wrapper' },
-          this._renderBoards(this.props.ownedBoards),
+          this._renderBoards(ownedBoards),
           this._renderAddNewBoard()
         );
       }
@@ -36486,10 +36721,10 @@ var HomeIndexView = function (_React$Component) {
   }, {
     key: '_renderAddNewBoard',
     value: function _renderAddNewBoard() {
-      var _props = this.props,
-          showForm = _props.showForm,
-          dispatch = _props.dispatch,
-          formErrors = _props.formErrors;
+      var _props2 = this.props,
+          showForm = _props2.showForm,
+          dispatch = _props2.dispatch,
+          formErrors = _props2.formErrors;
 
 
       if (!showForm) return this._renderAddButton();
@@ -36544,7 +36779,9 @@ var HomeIndexView = function (_React$Component) {
 }(_react2.default.Component);
 
 var mapStateToProps = function mapStateToProps(state) {
-  return state.boards;
+  return {
+    boards: state.boards
+  };
 };
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps)(HomeIndexView);
@@ -36835,30 +37072,30 @@ var mapStateToProps = function mapStateToProps(state) {
 exports.default = (0, _reactRedux.connect)(mapStateToProps)(SessionsNew);
 });
 
-require.alias("invariant/browser.js", "invariant");
-require.alias("whatwg-fetch/fetch.js", "whatwg-fetch");
-require.alias("redux-simple-router/lib/index.js", "redux-simple-router");
+require.alias("react/react.js", "react");
 require.alias("react-router-redux/lib/index.js", "react-router-redux");
-require.alias("isomorphic-fetch/fetch-npm-browserify.js", "isomorphic-fetch");
 require.alias("react-redux/lib/index.js", "react-redux");
 require.alias("react-router/lib/index.js", "react-router");
-require.alias("process/browser.js", "process");
-require.alias("redux-thunk/lib/index.js", "redux-thunk");
-require.alias("charenc/charenc.js", "charenc");
-require.alias("react/react.js", "react");
 require.alias("react-page-click/lib/index.js", "react-page-click");
+require.alias("md5/md5.js", "md5");
+require.alias("history/node_modules/warning/browser.js", "history/node_modules/warning");
+require.alias("es6-promise/dist/es6-promise.js", "es6-promise");
+require.alias("warning/browser.js", "warning");
+require.alias("process/browser.js", "process");
+require.alias("isomorphic-fetch/fetch-npm-browserify.js", "isomorphic-fetch");
+require.alias("crypt/crypt.js", "crypt");
 require.alias("phoenix_html/priv/static/phoenix_html.js", "phoenix_html");
+require.alias("whatwg-fetch/fetch.js", "whatwg-fetch");
+require.alias("redux/lib/index.js", "redux");
 require.alias("lodash/lodash.js", "lodash");
+require.alias("redux-logger/dist/redux-logger.js", "redux-logger");
+require.alias("redux-thunk/lib/index.js", "redux-thunk");
 require.alias("phoenix/priv/static/phoenix.js", "phoenix");
 require.alias("react-gravatar/dist/index.js", "react-gravatar");
-require.alias("warning/browser.js", "warning");
-require.alias("crypt/crypt.js", "crypt");
-require.alias("history/node_modules/warning/browser.js", "history/node_modules/warning");
+require.alias("redux-simple-router/lib/index.js", "redux-simple-router");
+require.alias("invariant/browser.js", "invariant");
 require.alias("history/lib/index.js", "history");
-require.alias("redux/lib/index.js", "redux");
-require.alias("md5/md5.js", "md5");
-require.alias("redux-logger/dist/redux-logger.js", "redux-logger");
-require.alias("es6-promise/dist/es6-promise.js", "es6-promise");process = require('process');require.register("___globals___", function(exports, require, module) {
+require.alias("charenc/charenc.js", "charenc");process = require('process');require.register("___globals___", function(exports, require, module) {
   
 });})();require('___globals___');
 
