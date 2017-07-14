@@ -1,5 +1,3 @@
-# web/controllers/api/v1/session_controller.ex
-
 defmodule PhoenixTrello.SessionController do
   use PhoenixTrello.Web, :controller
 
