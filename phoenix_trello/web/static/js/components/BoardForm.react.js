@@ -8,7 +8,7 @@ export default class BoardForm extends React.Component {
     this.refs.name.focus();
     this._handleSubmit = this._handleSubmit.bind(this);
     this._handleCancelClick = this._handleCancelClick.bind(this);
-    his._handleCancelClick = this._handleCancelClick.bind(this);
+    this._handleCancelClick = this._handleCancelClick.bind(this);
   }
 
   _handleSubmit(e) {
