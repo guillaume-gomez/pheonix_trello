@@ -1,7 +1,7 @@
 defmodule PhoenixTrello.User do
   use PhoenixTrello.Web, :model
 
-  alias PhoenixTrello.{Board, UserBoard}
+  alias PhoenixTrello.{Board}
 
   @derive {Poison.Encoder, only: [:id, :first_name, :last_name, :email]}
 
@@ -19,8 +19,7 @@ defmodule PhoenixTrello.User do
     timestamps()
   end
 
-  @required_fields ~w(first_name last_name email password)a
-  @optional_fields ~w(encrypted_password)a
+  @required_fields ~w(first_name last_name email password)
 
   @doc """
   Creates a changeset based on the `model` and `params`.
