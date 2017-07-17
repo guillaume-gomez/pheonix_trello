@@ -4,11 +4,14 @@ import Actions  from '../actions/boardsActionsCreators';
 import {renderErrorsFor} from '../utils';
 
 export default class BoardForm extends React.Component {
-  componentDidMount() {
-    this.refs.name.focus();
+  constructor(props) {
+    super(props);
     this._handleSubmit = this._handleSubmit.bind(this);
     this._handleCancelClick = this._handleCancelClick.bind(this);
-    this._handleCancelClick = this._handleCancelClick.bind(this);
+  }
+
+  componentDidMount() {
+    this.refs.name.focus();
   }
 
   _handleSubmit(e) {

@@ -14,6 +14,7 @@ class HomeIndexView extends React.Component {
     this._renderBoards = this._renderBoards.bind(this);
     this._renderAddNewBoard = this._renderAddNewBoard.bind(this);
     this._handleCancelClick = this._handleCancelClick.bind(this);
+    this._handleAddNewClick = this._handleAddNewClick.bind(this);
   }
 
   componentDidMount() {
@@ -24,8 +25,8 @@ class HomeIndexView extends React.Component {
   }
 
   _renderOwnedBoards() {
-    const { fetching, boards } = this.props;
-    const { ownedBoards } = boards;
+    const { boards } = this.props;
+    const { ownedBoards, fetching } = boards;
     let content = false;
 
     const iconClasses = classnames({
@@ -64,8 +65,8 @@ class HomeIndexView extends React.Component {
   }
 
   _renderAddNewBoard() {
-    let { showForm, dispatch, formErrors } = this.props;
-
+    let { boards, dispatch } = this.props;
+    const { showForm, formErrors } = boards;
     if (!showForm) return this._renderAddButton();
 
     return (

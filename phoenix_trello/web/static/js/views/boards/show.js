@@ -1,223 +1,237 @@
-// import React, {PropTypes} from 'react';
-// import { connect } from 'react-redux';
-// import {DragDropContext} from 'react-dnd';
-// import HTML5Backend from 'react-dnd-html5-backend';
+import React, {PropTypes} from 'react';
+import { connect } from 'react-redux';
+import {DragDropContext} from 'react-dnd';
+import HTML5Backend from 'react-dnd-html5-backend';
 
-// import Actions from '../../actions/current_board';
-// import Constants from '../../constants';
-// import { setDocumentTitle } from '../../utils';
-// import ListForm from '../../components/lists/form';
-// import ListCard from '../../components/lists/card';
-// import BoardMembers from '../../components/boards/members';
+import Actions from '../../actions/currentBoardActionsCreators';
+import Constants from '../../constants';
+import { setDocumentTitle } from '../../utils';
+import ListForm from '../../components/ListForm.react';
+import ListCard from '../../components/ListCard.react';
+import BoardMembers from '../../components/BoardMembers.react';
 
-// @DragDropContext(HTML5Backend)
+//@DragDropContext(HTML5Backend)
 
-// class BoardsShowView extends React.Component {
-//   componentDidMount() {
-//     const { socket } = this.props;
+class BoardsShowView extends React.Component {
+  constructor(props) {
+    super(props);
+    ["_handleDropCard",
+    "_handleDropCardWhenEmpty",
+    "_handleDropList",
+    "_handleCancelClick",
+    "_handleAddNewClick",
+    "_renderMembers",
+    "_renderLists",
+    "_renderAddNewList"].forEach(obj => {
+      this[item] = this[item].bind(this);
+    });
+  }
 
-//     if (!socket) {
-//       return false;
-//     }
+  componentDidMount() {
+    const { socket } = this.props;
 
-//     this.props.dispatch(Actions.connectToChannel(socket, this.props.params.id));
-//   }
+    if (!socket) {
+      return false;
+    }
 
-//   componentWillUpdate(nextProps, nextState) {
-//     const { socket } = this.props;
-//     const { currentBoard } = nextProps;
+    this.props.dispatch(Actions.connectToChannel(socket, this.props.params.id));
+  }
 
-//     if (currentBoard.name !== undefined) setDocumentTitle(currentBoard.name);
+  componentWillUpdate(nextProps, nextState) {
+    const { socket } = this.props;
+    const { currentBoard } = nextProps;
 
-//     if (socket) {
-//       return false;
-//     }
+    if (currentBoard.name !== undefined) setDocumentTitle(currentBoard.name);
 
-//     this.props.dispatch(Actions.connectToChannel(nextProps.socket, this.props.params.id));
-//   }
+    if (socket) {
+      return false;
+    }
 
-//   componentWillUnmount() {
-//     this.props.dispatch(Actions.leaveChannel(this.props.currentBoard.channel));
-//   }
+    this.props.dispatch(Actions.connectToChannel(nextProps.socket, this.props.params.id));
+  }
 
-//   _renderMembers() {
-//     const { connectedUsers, showUsersForm, channel, error } = this.props.currentBoard;
-//     const { dispatch } = this.props;
-//     const members = this.props.currentBoard.members;
-//     const currentUserIsOwner = this.props.currentBoard.user.id === this.props.currentUser.id;
+  componentWillUnmount() {
+    this.props.dispatch(Actions.leaveChannel(this.props.currentBoard.channel));
+  }
 
-//     return (
-//       <BoardMembers
-//         dispatch={dispatch}
-//         channel={channel}
-//         currentUserIsOwner={currentUserIsOwner}
-//         members={members}
-//         connectedUsers={connectedUsers}
-//         error={error}
-//         show={showUsersForm} />
-//     );
-//   }
+  _renderMembers() {
+    const { connectedUsers, showUsersForm, channel, error } = this.props.currentBoard;
+    const { dispatch } = this.props;
+    const members = this.props.currentBoard.members;
+    const currentUserIsOwner = this.props.currentBoard.user.id === this.props.currentUser.id;
 
-//   _renderLists() {
-//     const { lists, channel, editingListId, id, addingNewCardInListId } = this.props.currentBoard;
+    return (
+      <BoardMembers
+        dispatch={dispatch}
+        channel={channel}
+        currentUserIsOwner={currentUserIsOwner}
+        members={members}
+        connectedUsers={connectedUsers}
+        error={error}
+        show={showUsersForm} />
+    );
+  }
 
-//     return lists.map((list) => {
-//       return (
-//         <ListCard
-//           key={list.id}
-//           boardId={id}
-//           dispatch={this.props.dispatch}
-//           channel={channel}
-//           isEditing={editingListId === list.id}
-//           onDropCard={::this._handleDropCard}
-//           onDropCardWhenEmpty={::this._handleDropCardWhenEmpty}
-//           onDrop={::this._handleDropList}
-//           isAddingNewCard={addingNewCardInListId === list.id}
-//           {...list} />
-//       );
-//     });
-//   }
+  _renderLists() {
+    const { lists, channel, editingListId, id, addingNewCardInListId } = this.props.currentBoard;
 
-//   _renderAddNewList() {
-//     const { dispatch, formErrors, currentBoard } = this.props;
+    return lists.map((list) => {
+      return (
+        <ListCard
+          key={list.id}
+          boardId={id}
+          dispatch={this.props.dispatch}
+          channel={channel}
+          isEditing={editingListId === list.id}
+          onDropCard={this._handleDropCard}
+          onDropCardWhenEmpty={this._handleDropCardWhenEmpty}
+          onDrop={this._handleDropList}
+          isAddingNewCard={addingNewCardInListId === list.id}
+          {...list} />
+      );
+    });
+  }
 
-//     if (!currentBoard.showForm) return this._renderAddButton();
+  _renderAddNewList() {
+    const { dispatch, formErrors, currentBoard } = this.props;
 
-//     return (
-//       <ListForm
-//         dispatch={dispatch}
-//         errors={formErrors}
-//         channel={currentBoard.channel}
-//         onCancelClick={::this._handleCancelClick} />
-//     );
-//   }
+    if (!currentBoard.showForm) return this._renderAddButton();
 
-//   _renderAddButton() {
-//     return (
-//       <div className="list add-new" onClick={::this._handleAddNewClick}>
-//         <div className="inner">
-//           Add new list...
-//         </div>
-//       </div>
-//     );
-//   }
+    return (
+      <ListForm
+        dispatch={dispatch}
+        errors={formErrors}
+        channel={currentBoard.channel}
+        onCancelClick={this._handleCancelClick} />
+    );
+  }
 
-//   _handleAddNewClick() {
-//     const { dispatch } = this.props;
+  _renderAddButton() {
+    return (
+      <div className="list add-new" onClick={this._handleAddNewClick}>
+        <div className="inner">
+          Add new list...
+        </div>
+      </div>
+    );
+  }
 
-//     dispatch(Actions.showForm(true));
-//   }
+  _handleAddNewClick() {
+    const { dispatch } = this.props;
 
-//   _handleCancelClick() {
-//     this.props.dispatch(Actions.showForm(false));
-//   }
+    dispatch(Actions.showForm(true));
+  }
 
-//   _handleDropCard({ source, target }) {
-//     const { lists, channel } = this.props.currentBoard;
-//     const { dispatch } = this.props;
+  _handleCancelClick() {
+    this.props.dispatch(Actions.showForm(false));
+  }
 
-//     const sourceListIndex = lists.findIndex((list) => { return list.id === source.list_id; });
-//     const sourceList = lists[sourceListIndex];
-//     const sourceCardIndex = sourceList.cards.findIndex((card) => { return card.id === source.id; });
-//     const sourceCard = sourceList.cards[sourceCardIndex];
+  _handleDropCard({ source, target }) {
+    const { lists, channel } = this.props.currentBoard;
+    const { dispatch } = this.props;
 
-//     const targetListIndex = lists.findIndex((list) => { return list.id === target.list_id; });
-//     let targetList = lists[targetListIndex];
-//     const targetCardIndex = targetList.cards.findIndex((card) => { return card.id === target.id; });
-//     const targetCard = targetList.cards[targetCardIndex];
-//     const previousTargetCard = sourceList.cards[sourceCardIndex + 1];
+    const sourceListIndex = lists.findIndex((list) => { return list.id === source.list_id; });
+    const sourceList = lists[sourceListIndex];
+    const sourceCardIndex = sourceList.cards.findIndex((card) => { return card.id === source.id; });
+    const sourceCard = sourceList.cards[sourceCardIndex];
 
-//     if (previousTargetCard === targetCard) { return false; }
+    const targetListIndex = lists.findIndex((list) => { return list.id === target.list_id; });
+    let targetList = lists[targetListIndex];
+    const targetCardIndex = targetList.cards.findIndex((card) => { return card.id === target.id; });
+    const targetCard = targetList.cards[targetCardIndex];
+    const previousTargetCard = sourceList.cards[sourceCardIndex + 1];
 
-//     sourceList.cards.splice(sourceCardIndex, 1);
+    if (previousTargetCard === targetCard) { return false; }
 
-//     if (sourceList === targetList) {
-//       const insertIndex = sourceCardIndex < targetCardIndex ? targetCardIndex - 1 : targetCardIndex;
-//       // move at once to avoid complications
-//       targetList = sourceList;
-//       sourceList.cards.splice(insertIndex, 0, source);
-//     } else {
-//       // and move it to target
-//       targetList.cards.splice(targetCardIndex, 0, source);
-//     }
+    sourceList.cards.splice(sourceCardIndex, 1);
 
-//     const newIndex = targetList.cards.findIndex((card) => { return card.id === source.id; });
+    if (sourceList === targetList) {
+      const insertIndex = sourceCardIndex < targetCardIndex ? targetCardIndex - 1 : targetCardIndex;
+      // move at once to avoid complications
+      targetList = sourceList;
+      sourceList.cards.splice(insertIndex, 0, source);
+    } else {
+      // and move it to target
+      targetList.cards.splice(targetCardIndex, 0, source);
+    }
 
-//     const position = newIndex == 0 ? targetList.cards[newIndex + 1].position / 2 : newIndex == (targetList.cards.length - 1) ? targetList.cards[newIndex - 1].position + 1024 : (targetList.cards[newIndex - 1].position + targetList.cards[newIndex + 1].position) / 2;
+    const newIndex = targetList.cards.findIndex((card) => { return card.id === source.id; });
 
-//     const data = {
-//       id: sourceCard.id,
-//       list_id: targetList.id,
-//       position: position,
-//     };
+    const position = newIndex == 0 ? targetList.cards[newIndex + 1].position / 2 : newIndex == (targetList.cards.length - 1) ? targetList.cards[newIndex - 1].position + 1024 : (targetList.cards[newIndex - 1].position + targetList.cards[newIndex + 1].position) / 2;
 
-//     dispatch(Actions.updateCard(channel, data));
-//   }
+    const data = {
+      id: sourceCard.id,
+      list_id: targetList.id,
+      position: position,
+    };
 
-//   _handleDropList({ source, target }) {
-//     const { lists, channel } = this.props.currentBoard;
-//     const { dispatch } = this.props;
+    dispatch(Actions.updateCard(channel, data));
+  }
 
-//     const sourceListIndex = lists.findIndex((list) => { return list.id === source.id; });
-//     const sourceList = lists[sourceListIndex];
-//     lists.splice(sourceListIndex, 1);
+  _handleDropList({ source, target }) {
+    const { lists, channel } = this.props.currentBoard;
+    const { dispatch } = this.props;
 
-//     const targetListIndex = lists.findIndex((list) => { return list.id === target.id; });
-//     const targetList = lists[targetListIndex];
-//     lists.splice(targetListIndex, 0, sourceList);
+    const sourceListIndex = lists.findIndex((list) => { return list.id === source.id; });
+    const sourceList = lists[sourceListIndex];
+    lists.splice(sourceListIndex, 1);
 
-//     const newIndex = lists.findIndex((list) => { return list.id === source.id; });
+    const targetListIndex = lists.findIndex((list) => { return list.id === target.id; });
+    const targetList = lists[targetListIndex];
+    lists.splice(targetListIndex, 0, sourceList);
 
-//     const position = newIndex == 0 ? lists[newIndex + 1].position / 2 : newIndex == (lists.length - 1) ? lists[newIndex - 1].position + 1024 : (lists[newIndex - 1].position + lists[newIndex + 1].position) / 2;
+    const newIndex = lists.findIndex((list) => { return list.id === source.id; });
 
-//     const data = {
-//       id: source.id,
-//       position: position,
-//     };
+    const position = newIndex == 0 ? lists[newIndex + 1].position / 2 : newIndex == (lists.length - 1) ? lists[newIndex - 1].position + 1024 : (lists[newIndex - 1].position + lists[newIndex + 1].position) / 2;
 
-//     dispatch(Actions.updateList(channel, data));
-//   }
+    const data = {
+      id: source.id,
+      position: position,
+    };
 
-//   _handleDropCardWhenEmpty(card) {
-//     const { channel } = this.props.currentBoard;
-//     const { dispatch } = this.props;
+    dispatch(Actions.updateList(channel, data));
+  }
 
-//     dispatch(Actions.updateCard(channel, card));
-//   }
+  _handleDropCardWhenEmpty(card) {
+    const { channel } = this.props.currentBoard;
+    const { dispatch } = this.props;
 
-//   render() {
-//     const { fetching, name } = this.props.currentBoard;
+    dispatch(Actions.updateCard(channel, card));
+  }
 
-//     if (fetching) return (
-//       <div className="view-container boards show">
-//         <i className="fa fa-spinner fa-spin"/>
-//       </div>
-//     );
+  render() {
+    const { fetching, name } = this.props.currentBoard;
 
-//     return (
-//       <div className="view-container boards show">
-//         <header className="view-header">
-//           <h3>{name}</h3>
-//           {::this._renderMembers()}
-//         </header>
-//         <div className="canvas-wrapper">
-//           <div className="canvas">
-//             <div className="lists-wrapper">
-//               {::this._renderLists()}
-//               {::this._renderAddNewList()}
-//             </div>
-//           </div>
-//         </div>
-//         {this.props.children}
-//       </div>
-//     );
-//   }
-// }
+    if (fetching) return (
+      <div className="view-container boards show">
+        <i className="fa fa-spinner fa-spin"/>
+      </div>
+    );
 
-// const mapStateToProps = (state) => ({
-//   currentBoard: state.currentBoard,
-//   socket: state.session.socket,
-//   currentUser: state.session.currentUser,
-// });
+    return (
+      <div className="view-container boards show">
+        <header className="view-header">
+          <h3>{name}</h3>
+          {this._renderMembers()}
+        </header>
+        <div className="canvas-wrapper">
+          <div className="canvas">
+            <div className="lists-wrapper">
+              {this._renderLists()}
+              {this._renderAddNewList()}
+            </div>
+          </div>
+        </div>
+        {this.props.children}
+      </div>
+    );
+  }
+}
 
-// export default connect(mapStateToProps)(BoardsShowView);
+const mapStateToProps = (state) => ({
+  currentBoard: state.currentBoard,
+  socket: state.session.socket,
+  currentUser: state.session.currentUser,
+});
+
+export default connect(mapStateToProps)(BoardsShowView);
