@@ -15,7 +15,6 @@ defmodule PhoenixTrello.User do
     has_many :owned_boards, Board
     #has_many :user_boards, UserBoard
     #has_many :boards, through: [:user_boards, :board]
-
     timestamps()
   end
 
